@@ -1,22 +1,61 @@
 
+import luxe.AppConfig;
+import luxe.Color;
+import luxe.Entity;
 import luxe.Input;
 import luxe.States;
+import luxe.Vector;
 
 class Main extends luxe.Game
 {
 
     var machine:States;
 
+    var shader:Entity;
+
+
+    override public function config( _config:AppConfig ) : luxe.AppConfig{
+
+        _config.preload.textures.push({ id:'assets/images/player.gif' });
+        _config.preload.textures.push({ id:'assets/images/tiles.gif' });
+        _config.preload.textures.push({ id:'assets/images/faderBlack.gif' });
+        _config.preload.textures.push({ id:'assets/images/lightmask.png' });
+
+        _config.preload.shaders.push({
+            id:"lowres", frag_id:"assets/shaders/lowres.glsl", vert_id:"default"
+        });
+
+        return _config;
+
+    }
+
     override function ready() {
 
+        Luxe.renderer.clear_color = new Color().rgb(C.c1);
+        Luxe.camera.zoom = 4;
+
+        // Machines
         machine = new States({ name:'statemachine' });
 
         // machine.add( new IntroState() );
         // machine.add( new MenuState() );
-        // machine.add( new GameState() );
+        machine.add( new Game() );
         // machine.add( new GameOverState() );
-
         
+        machine.set('game');
+
+
+
+        shader = new Entity({
+            name: 'entity',
+        });
+        shader.add( new components.LowresShader({
+            name: 'lowres',
+            pixel_size: new Vector( Game.width/Luxe.camera.zoom, Game.height/Luxe.camera.zoom ),
+        }) );
+
+
+        // phoenix.Texture.default_filter = phoenix.Texture.FilterType.nearest;
 
     } //ready
 
@@ -31,6 +70,21 @@ class Main extends luxe.Game
     override function update(dt:Float) {
 
     } //update
+
+
+
+    /**
+     * Shader stuff
+     */
+    override function onprerender()
+    {
+        shader.get('lowres').onprerender();
+    }
+
+    override function onpostrender()
+    {
+        shader.get('lowres').onpostrender();
+    }
 
 
 } //Main
@@ -54,13 +108,16 @@ class MenuState extends State {
 
 }
 
-class GameState extends State {
+
+class PrepareGameState extends State {
 
     public function new()
     {
-        super({ name:'game' });
+        super({ name:'menu' });
     }
+
 }
+
 
 class GameOverState extends State {
 
