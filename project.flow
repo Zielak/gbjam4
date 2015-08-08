@@ -1,0 +1,37 @@
+{
+
+  luxe:{
+    window: {
+      width:640,
+      height:576,
+      title:'Rush',
+      fullscreen:false,
+      resizable:false,
+      borderless:true
+    }
+  },
+  
+
+  project : {
+    name : 'Rush',
+    version : '0.0.1',
+    author : 'Darek Greenly',
+
+    app : {
+      name : 'rush',
+      package : 'com.darekgreenly.rush'
+    },
+
+    build : {
+      dependencies : {
+        luxe : '*',
+      }
+    },
+
+    files : {
+      assets : 'assets/'
+    }
+
+  }
+
+}
