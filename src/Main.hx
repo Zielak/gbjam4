@@ -17,6 +17,9 @@ class Main extends luxe.Game
     override public function config( _config:AppConfig ) : luxe.AppConfig{
 
         _config.preload.textures.push({ id:'assets/images/player.gif' });
+        _config.preload.textures.push({ id:'assets/images/gal.gif' });
+        _config.preload.textures.push({ id:'assets/images/hud.gif' });
+        _config.preload.textures.push({ id:'assets/images/hearth.gif' });
         _config.preload.textures.push({ id:'assets/images/tiles.gif' });
         _config.preload.textures.push({ id:'assets/images/faderBlack.gif' });
         _config.preload.textures.push({ id:'assets/images/lightmask.png' });
@@ -33,6 +36,7 @@ class Main extends luxe.Game
 
         Luxe.renderer.clear_color = new Color().rgb(C.c1);
         Luxe.camera.zoom = 4;
+        Luxe.camera.pos.set_xy( -Game.width*1.5, -Game.height*1.5 );
 
         // Machines
         machine = new States({ name:'statemachine' });
@@ -100,16 +104,6 @@ class IntroState extends State {
 }
 
 class MenuState extends State {
-
-    public function new()
-    {
-        super({ name:'menu' });
-    }
-
-}
-
-
-class PrepareGameState extends State {
 
     public function new()
     {

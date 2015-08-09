@@ -11,21 +11,38 @@ import phoenix.Texture;
 
 class Game extends State {
 
-    var player:Player;
-    var lightmask:Sprite;
-
-
-    public static var random:Random;
-    public static var level:Int;
-    public static var gameType:GameType;
-
-    // Gameplay time
-    public static inline var time:Float = 0;
-
     public static inline var width:Int = 160;
     public static inline var height:Int = 144;
 
-    public static inline var direction:Float = 0;
+    var player:Player;
+    var lightmask:Sprite;
+
+    var spawner:Spawner;
+
+    var hud:Hud;
+
+    public static var random:Random;
+
+    // Gameplay time
+    public static var level:Int;
+    public static var gameType:GameType;
+
+    // is game on? If not, then it's probably preparing (startup stuff)
+    public static var playing:Bool = false;
+
+    // quick delay during gameplay, like getting mushroom in Mario
+    public static var delayed:Bool = false;
+
+    public static var difficulty:Float = 0;
+    public static var time:Float = 0;
+    public static var hope:Float = 1;
+
+    // How much hope are we loosing each update?
+    public static var HOPE_MULT:Float = 0.1;
+
+
+
+    public static var direction:Direction = right;
 
     public function new()
     {
@@ -44,7 +61,9 @@ class Game extends State {
         // trace('bounds : ${bounds}');
         // trace('Luxe.camera.pos : ${Luxe.camera.pos}');
 
-        // create_hud();
+        reset();
+
+        create_hud();
 
         // init_events();
 
@@ -53,6 +72,27 @@ class Game extends State {
 
         spam_tiles();
 
+    }
+
+    function reset()
+    {
+        Game.difficulty = 0;
+        Game.time = 0;
+        Game.hope = 1;
+
+        Game.direction = right;
+
+        Game.playing = false;
+        Game.delayed = false;
+
+        // random.seed = Math.random();
+    }
+
+    function create_hud()
+    {
+        hud = new Hud({
+            name: 'hud',
+        });
     }
 
 
@@ -70,8 +110,6 @@ class Game extends State {
         });
         player.texture.filter_mag = nearest;
         player.texture.filter_min = nearest;
-
-        Luxe.camera.focus( player.pos );
 
     }
 
@@ -117,10 +155,29 @@ class Game extends State {
             // });
         }
     }
+
+
+    override function update(dt:Float)
+    {
+        Game.time += dt;
+        if(playing && !delayed)
+        {
+            Game.hope -= dt * Game.HOPE_MULT;
+        }
+
+        Game.hope = Math.sin(Game.time/2)/2 + 0.5;
+    }
 }
 
 
 enum GameType {
     Endless;
     Classic;
+}
+
+enum Direction {
+    left;
+    bottom;
+    right;
+    top;
 }

@@ -9,8 +9,10 @@ import luxe.Vector;
 class Movement extends Component
 {
 
-    public var yspeed:Float;
-    public var xspeed:Float;
+    public var velocity:Vector;
+    var yspeed:Float;
+    var xspeed:Float;
+    
     public var bounds:Rectangle;
     public var killBounds:Rectangle;
 
@@ -23,10 +25,12 @@ class Movement extends Component
     } //ready
 
 
-    override function onfixedupdate(rate:Float):Void
+    override function update(dt:Float):Void
     {
-        pos.x += xspeed * rate;
-        pos.y += yspeed * rate;
+
+
+        pos.x += xspeed * dt;
+        pos.y += yspeed * dt;
 
         if(pos.x > killBounds.w
         || pos.x < killBounds.x

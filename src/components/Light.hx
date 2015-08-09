@@ -4,6 +4,8 @@ import luxe.Component;
 import luxe.Sprite;
 import luxe.utils.Maths;
 
+import phoenix.Texture.ClampType;
+
 class Light extends Component{
 
     public static inline var MAX_SIZE:Float = 700;
@@ -43,7 +45,9 @@ class Light extends Component{
     
     override function update(dt:Float)
     {
-        if(sprite == null) break;
+        if(sprite == null) return;
+
+        size = Game.hope;
 
         if(test)
         {
@@ -55,10 +59,6 @@ class Light extends Component{
         sprite.uv.y = texture_h * Maths.lerp(MIN_POS_MULT, MAX_POS_MULT, size);
         sprite.uv.w = texture_w * Maths.lerp(MIN_SIZE_MULT, MAX_SIZE_MULT, size);
         sprite.uv.h = texture_h * Maths.lerp(MIN_SIZE_MULT, MAX_SIZE_MULT, size);
-
-        // trace(sprite.uv);
-
-         // new Rectangle(-128, -128, size*MAX_SIZE, size*MAX_SIZE);
     }
 
 }
