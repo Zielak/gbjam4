@@ -1,6 +1,7 @@
 
 package ;
 
+import luxe.Rectangle;
 import luxe.Sprite;
 import luxe.Vector;
 import luxe.components.sprite.SpriteAnimation;
@@ -19,7 +20,10 @@ class Player extends Sprite
     var decelerate:Float    = 4;
 
     var velocity:Vector;
+    var game_v:Vector;
     var realPos:Vector;
+
+    var bounds:Rectangle;
 
     var _speed:Float = 0;
     var _angle:Float = 0;
@@ -32,7 +36,15 @@ class Player extends Sprite
         // fixed_rate = 1/60;
 
         velocity = new Vector(0,0);
+        game_v = new Vector(0,0);
         realPos = pos.clone();
+
+        bounds = new Rectangle(
+            SIZE/2,
+            SIZE/2,
+            Game.width-SIZE,
+            Game.height-SIZE
+        );
 
         input = new Input({name: 'input'});
 
@@ -74,37 +86,49 @@ class Player extends Sprite
 
     override function update(dt:Float):Void
     {
-        setSpeed(dt);
+        if(Game.playing && !Game.delayed)
+        {
+            setSpeed(dt);
 
-        _angle = input.angle;
-        velocity.set_xy(_speed, 0);
+            _angle = input.angle;
+            velocity.set_xy(_speed, 0);
 
-        if(_angle != -1 && _speed > 0) velocity.angle2D = _angle;
+            if(_angle != -1 && _speed > 0) velocity.angle2D = _angle;
 
+                // Update Bounds
+            bounds.x = Luxe.camera.center.x - Game.width/2 + SIZE/2;
+            bounds.y = Luxe.camera.center.y - Game.height/2 + SIZE/2;
 
+                // Apply
+            realPos.add(velocity);
 
-            // Apply
-        realPos.add(velocity);
+                // Game velocity too
+            game_v.copy_from(Game.directional_vector());
+            game_v.x *= dt;
+            game_v.y *= dt;
+            realPos.add(game_v);
 
-            // Bounds
-        if( realPos.x > Game.width-SIZE/2 ) realPos.x = Game.width-SIZE/2;
-        if( realPos.x < SIZE/2 ) realPos.x = SIZE/2;
+                // Bounds
+            if( realPos.x > bounds.x + bounds.w ) realPos.x = bounds.x + bounds.w;
+            if( realPos.x < bounds.x ) realPos.x = bounds.x;
 
-        if( realPos.y > Game.height-SIZE/2 ) realPos.y = Game.height-SIZE/2;
-        if( realPos.y < SIZE/2 ) realPos.y = SIZE/2;
+            if( realPos.y > bounds.y + bounds.h ) realPos.y = bounds.y + bounds.h;
+            if( realPos.y < bounds.y ) realPos.y = bounds.y;
 
-        pos.copy_from(realPos);
-        // pos = pos.int();
-        pos.x = Math.round(pos.x);
-        pos.y = Math.round(pos.y);
+            pos.copy_from(realPos);
+            // pos = pos.int();
+            pos.x = Math.round(pos.x);
+            pos.y = Math.round(pos.y);
 
-        if(input.move){
-            // trace('player pos: ${pos.x}, ${pos.y}');
+            if(input.move){
+                // trace('player pos: ${pos.x}, ${pos.y}');
+            }
+
+            // Animation
+            anim.speed = 9 + 8*(1 - Game.hope);
+        }else{
+            // anim.speed = 0;
         }
-
-        // Animation
-        anim.speed = 9 + 8*(1 - Game.hope);
-
     }
 
 

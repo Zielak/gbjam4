@@ -1,4 +1,6 @@
 
+import components.DestroyByDistance;
+import components.Movement;
 import luxe.components.sprite.SpriteAnimation;
 import luxe.Sprite;
 import luxe.Component;
@@ -14,6 +16,8 @@ class Tile extends Sprite {
     var tile_id:Int = -1;
     var tiles_x:Int;
     var tiles_y:Int;
+
+    var mover:Movement;
     
     override public function new(_options:TileOptions)
     {
@@ -40,6 +44,10 @@ class Tile extends Sprite {
     override function init()
     {
 
+        // events.listen('movement.killBounds', function(){
+        //     Luxe.events.fire('tile.outofbounds');
+        // });
+
         if(tile_id == -1){
             tile_id = Math.floor( Math.random()*TILES_COUNT );
         }
@@ -48,7 +56,11 @@ class Tile extends Sprite {
         this.uv.h = TILE_SIZE;
 
         this.uv.x = tile_id * TILE_SIZE;
-        // this.uv.y = Math.floor( tile_id / tiles_x );
+
+        add( new DestroyByDistance( {
+            name: 'distance',
+            distance: 160,
+        }));
     }
 
 }
