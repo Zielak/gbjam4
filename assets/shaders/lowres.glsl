@@ -18,7 +18,7 @@ vec2 iResolution = vec2(SCREEN_WIDTH, SCREEN_HEIGHT);
 vec3 find_closest (vec3 ref) {  
     vec3 old = vec3 (100.0*255.0);      
     #define TRY_COLOR(new) old = mix (new, old, step (length (old-ref), length (new-ref))); 
-    TRY_COLOR (vec3( 61, 20, 60));
+    TRY_COLOR (vec3( 62, 20, 60));
     TRY_COLOR (vec3(146,  0, 91));
     TRY_COLOR (vec3( 42,167,148));
     TRY_COLOR (vec3(246,221,241));

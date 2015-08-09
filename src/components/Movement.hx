@@ -33,7 +33,6 @@ class Movement extends Component
         || pos.y > killBounds.h
         || pos.y < killBounds.y)
         {
-            // trace('OUT OF SCENE trying to destroy myself ${pos}');
             entity.destroy(true);
         }
 
