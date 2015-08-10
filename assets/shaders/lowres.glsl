@@ -1,3 +1,5 @@
+// #version 130
+
 precision mediump float;
 
 #define BRIGHTNESS 1.0

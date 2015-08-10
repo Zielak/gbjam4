@@ -7,7 +7,7 @@
       title:'Rush',
       fullscreen:false,
       resizable:false,
-      borderless:true
+      borderless:false
     }
   },
   

@@ -18,11 +18,13 @@ class Spawner extends Entity {
     {
         time = 0;
 
+        populate_sequences();
+
         Luxe.events.listen('spawn.tilescolrow', function(_){
             spawn_tiles();
         });
         
-        pick_squence();
+        pick_sequence();
     }
 
 
@@ -32,19 +34,21 @@ class Spawner extends Entity {
         {
             time += dt;
             
-            sequences[current_sequence].update(dt);
-            
-            if( sequences[current_sequence].finished )
-            {
-                pick_sequence();
+            if( sequences.length > 0 ){
+                if( sequences[current_sequence].update(dt) ){
+                    pick_sequence();
+                }
             }
         }
     }
 
     function pick_sequence()
     {
-        current_sequence = Math.floor( Math.random()*(sequences.length-1) );
-        sequence_duration = squences[current_sequence].duration;
+        if(sequences.length > 0){
+            current_sequence = Math.floor( Math.random()*(sequences.length) );
+            sequence_duration = sequences[current_sequence].duration;
+            sequences[current_sequence].reset();
+        }
     }
 
     function spawn_tiles()
@@ -78,9 +82,9 @@ class Spawner extends Entity {
         }
 
 
-        for(i in -4...count+4)
+        for(i in -2...count+2)
         {
-            if(Math.random() > 0.85) continue;
+            if(Math.random() > 0.9) continue;
 
             if(col)
             {
@@ -110,6 +114,53 @@ class Spawner extends Entity {
             });
             // trace('tile spawned');
         }
+    }
+
+    // SHAME SHAME SHAME
+    // - ain't nobody got time to make JSON parser
+    function populate_sequences()
+    {
+        sequences = new Array<Sequence>();
+
+        var actions:Array<Action>;
+
+        // Spawn random crunchers
+        actions = new Array<Action>();
+
+        actions.push(new actions.SpawnCruncher({delay: 1}));
+        actions.push(new actions.SpawnCruncher({delay: 1}));
+        actions.push(new actions.SpawnCruncher({delay: 1}));
+        actions.push(new actions.SpawnCruncher({delay: 1}));
+        actions.push(new actions.SpawnCruncher({delay: 3}));
+        for(i in 0...10){
+            actions.push(new actions.SpawnCruncher({delay: 0.5}));
+        }
+
+        // sequences.push(new Sequence({actions: actions, delay: 3}) );
+
+
+        // Spawn FRONTAL Crunchers
+        actions = new Array<Action>();
+
+        for(i in 0...4){
+            actions.push(new actions.SpawnCruncher({
+                delay: 1, spawn_type:fromFront
+            }));
+        }
+        // sequences.push(new Sequence({actions: actions, delay: 3}) );
+
+
+
+        // Spawn BACK Crunchers
+        actions = new Array<Action>();
+
+        for(i in 0...7){
+            actions.push(new actions.SpawnCruncher({
+                delay: 1.5, spawn_type:fromBack
+            }));
+        }
+        sequences.push(new Sequence({actions: actions, delay: 3}) );
+
     }
 
 }

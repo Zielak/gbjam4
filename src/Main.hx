@@ -16,12 +16,20 @@ class Main extends luxe.Game
 
     override public function config( _config:AppConfig ) : luxe.AppConfig{
 
+        // Player
         _config.preload.textures.push({ id:'assets/images/player.gif' });
         _config.preload.textures.push({ id:'assets/images/gal.gif' });
+
+        // Enemies
+        _config.preload.textures.push({ id:'assets/images/cruncher.gif' });
+
+        // HUD
         _config.preload.textures.push({ id:'assets/images/hud.gif' });
         _config.preload.textures.push({ id:'assets/images/hearth.gif' });
-        _config.preload.textures.push({ id:'assets/images/tiles.gif' });
         _config.preload.textures.push({ id:'assets/images/faderBlack.gif' });
+
+        // World
+        _config.preload.textures.push({ id:'assets/images/tiles.gif' });
         _config.preload.textures.push({ id:'assets/images/lightmask.png' });
 
         _config.preload.shaders.push({

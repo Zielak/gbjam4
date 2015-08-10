@@ -1,5 +1,6 @@
 
 import components.Movement;
+import luxe.Input;
 import luxe.Color;
 import luxe.Rectangle;
 import luxe.Sprite;
@@ -50,10 +51,10 @@ class Game extends State {
     public static var GAL_MULT:Float = 0.015;
 
         // How much hope are we loosing each update?
-    public static var HOPE_MULT:Float = 0.025;
+    public static var HOPE_MULT:Float = 0;//0.025;
 
 
-    public static var speed:Float = 52;
+    public static var speed:Float = 60;
         // Distance travelled
     public static var distance:Float = 0;
         // Distance to Gal
@@ -61,7 +62,7 @@ class Game extends State {
 
     public static var direction:Direction = right;
     var prevent_quick_dir_change:Float = 0;
-    var prevent_quick_dir_change_max:Float = 3;
+    var prevent_quick_dir_change_max:Float = 8;
     public static function directional_vector():Vector
     {
         var _vec:Vector = new Vector(speed,0);
@@ -180,7 +181,7 @@ class Game extends State {
             size: new Vector(512,512),
             pos: player.pos.clone(),
             centered: true,
-            depth: 11
+            depth: 100
         });
         lightmask.add( new components.Follow({
             name: 'follow',
@@ -203,6 +204,7 @@ class Game extends State {
 
         for(x in 0...xm){
             for(y in 0...ym){
+                if(Math.random() > 0.9) continue;
                 _x = x * Tile.TILE_SIZE;
                 _y = y * Tile.TILE_SIZE;
                 
@@ -253,7 +255,7 @@ class Game extends State {
         prevent_quick_dir_change += dt;
         if(prevent_quick_dir_change >= prevent_quick_dir_change_max)
         {
-            if(Math.random() > 0.8)
+            if(Math.random() > 1)
             {
                 var _d = Math.round( Math.random() );
                 switch(Game.direction)
@@ -271,6 +273,15 @@ class Game extends State {
 
                 Luxe.events.fire('game.directon.changed');
             }
+        }
+    }
+
+
+    // HAXXX
+    override public function onkeydown( event:KeyEvent )
+    {
+        if(event.keycode == Key.key_h){
+            Game.hope = 1;
         }
     }
 }

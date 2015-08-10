@@ -2,43 +2,83 @@
 class Sequence {
     
     var actions:Array<Action>;
+    var current_action:Int = 0;
 
     // read by spawner.
     public var difficulty:Float;
     
-    var time:Float = 0;
+    var time:Float;
     
-    var duration:Float;
+    @:isVar public var duration (default, null):Float;
     var delay:Float = 0;
     var ending:Float = 0;
 
+    public var finished:Bool = false;
+
     public function new( options:SequenceOptions )
     {
+        actions = options.actions;
+
         if(options.delay != null){
             delay = options.delay;
         }
         if(options.ending != null){
             ending = options.ending;
         }
-        action = options.action;
         
             // get sequence's duration
-        for(i in actions)
+        duration = 0;
+        for(a in actions)
         {
-            duration 
+            duration += a.delay;
         }
         duration += delay + ending;
+
+        time = 0;
+
+
+        trace('sequence started...');
+        trace(' -  duration = ${duration}');
     }
     
-    public function update(dt:Float)
+    public function update(dt:Float):Bool
     {
-        time += dt;
-        
-        /*
-        if(something){
-            actions[current_action].update();
+        if(!finished)
+        {
+            time += dt;
+
+            if(time >= duration){
+                trace('sequence finished...');
+                finished = true;
+            }else if(time > delay){
+                actions[current_action].update(dt);
+                if(actions[current_action].fired) next();
+            }
         }
-        */
+        
+        return finished;
+        
+        // actions[current_action].update();
+    }
+
+    public function reset()
+    {
+        finished = false;
+        time = -delay;
+        current_action = 0;
+
+        for(a in actions){
+            a.reset();
+        }
+    }
+
+    function next()
+    {
+        current_action ++;
+        if(current_action >= actions.length){
+            finished = true;
+        }
+        trace(' - Next action [${current_action}]');
     }
 
 }

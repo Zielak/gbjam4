@@ -11,7 +11,7 @@ import luxe.Vector;
 class Tile extends Sprite {
     
     public static inline var TILE_SIZE:Float = 16;
-    public static inline var TILES_COUNT:Int = 4;
+    public static inline var TILES_COUNT:Int = 12;
 
     var tile_id:Int = -1;
     var tiles_x:Int;
@@ -19,25 +19,27 @@ class Tile extends Sprite {
 
     var mover:Movement;
     
-    override public function new(_options:TileOptions)
+    override public function new(options:TileOptions)
     {
-        _options.name_unique = true;
-        _options.name = 'Tile';
-        _options.centered = true;
-        _options.texture = Luxe.resources.texture('assets/images/tiles.gif');
-        _options.texture.filter_mag = nearest;
-        _options.texture.filter_min = nearest;
-        _options.size = new Vector(TILE_SIZE,TILE_SIZE);
+        options.name_unique = true;
+        options.name = 'Tile';
+        options.centered = true;
+        options.texture = Luxe.resources.texture('assets/images/tiles.gif');
+        options.texture.filter_mag = nearest;
+        options.texture.filter_min = nearest;
+        options.size = new Vector(TILE_SIZE,TILE_SIZE);
+        options.depth = 0;
 
-        super( _options);
 
-        if(_options.tile_id != null)
+        super( options);
+
+        if(options.tile_id != null)
         {
-            tile_id = _options.tile_id;
+            tile_id = options.tile_id;
         }
 
-        tiles_x = Math.floor(_options.texture.width / TILE_SIZE); 
-        tiles_y = Math.floor(_options.texture.height / TILE_SIZE);
+        tiles_x = Math.floor(options.texture.width / TILE_SIZE); 
+        tiles_y = Math.floor(options.texture.height / TILE_SIZE);
     }
 
 
