@@ -6,19 +6,19 @@ import luxe.Sprite;
 import luxe.Vector;
 import luxe.components.sprite.SpriteAnimation;
 
-class Cruncher extends Sprite
+class Bomb extends Sprite
 {
     
     var anim:SpriteAnimation;
 
-    override public function new(options:CruncherOptions)
+    override public function new(options:BombOptions)
     {
-        options.name = 'cruncher';
+        options.name = 'bomb';
         options.name_unique = true;
-        options.texture = Luxe.resources.texture('assets/images/cruncher.gif');
+        options.texture = Luxe.resources.texture('assets/images/bomb.gif');
         options.size = new Vector(16,16);
         options.centered = true;
-        options.depth = 8;
+        options.depth = 8.1;
 
         super(options);
 
@@ -33,17 +33,17 @@ class Cruncher extends Sprite
 
         var animation_json = '
             {
-                "walk" : {
+                "idle" : {
                     "frame_size":{ "x":"16", "y":"16" },
-                    "frameset": ["1","2","3","2"],
+                    "frameset": ["1","2"],
                     "loop": "true",
-                    "speed": "12"
+                    "speed": "8"
                 }
             }
         ';
 
         anim.add_from_json( animation_json );
-        anim.animation = 'walk';
+        anim.animation = 'idle';
         anim.play();
 
     }
@@ -57,6 +57,6 @@ class Cruncher extends Sprite
 
 }
 
-typedef CruncherOptions = {
+typedef BombOptions = {
     > SpriteOptions,
 }

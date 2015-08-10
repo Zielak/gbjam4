@@ -37,8 +37,8 @@ class Sequence {
         time = 0;
 
 
-        trace('sequence started...');
-        trace(' -  duration = ${duration}');
+        // trace('sequence started...');
+        // trace(' -  duration = ${duration}');
     }
     
     public function update(dt:Float):Bool
@@ -48,7 +48,7 @@ class Sequence {
             time += dt;
 
             if(time >= duration){
-                trace('sequence finished...');
+                // trace('sequence finished...');
                 finished = true;
             }else if(time > delay){
                 actions[current_action].update(dt);
@@ -78,7 +78,7 @@ class Sequence {
         if(current_action >= actions.length){
             finished = true;
         }
-        trace(' - Next action [${current_action}]');
+        // trace(' - Next action [${current_action}]');
     }
 
 }

@@ -15,9 +15,9 @@ class Player extends Sprite
     public static inline var SIZE:Float = 16;
 
     var movespeed:Float     = 0;
-    var maxmovespeed:Float  = 1.25;
-    var accelerate:Float    = 3;
-    var decelerate:Float    = 4;
+    var maxmovespeed:Float  = 1;
+    var accelerate:Float    = 8;
+    var decelerate:Float    = 1;
 
     var velocity:Vector;
     var game_v:Vector;
@@ -41,9 +41,9 @@ class Player extends Sprite
 
         bounds = new Rectangle(
             SIZE/2,
-            SIZE/2,
+            SIZE,
             Game.width-SIZE,
-            Game.height-SIZE
+            Game.height-SIZE*2
         );
 
         input = new Input({name: 'input'});

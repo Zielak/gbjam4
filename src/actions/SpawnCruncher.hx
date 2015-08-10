@@ -56,10 +56,10 @@ class SpawnCruncher extends Action {
         else if (spawn_type == fromBack)
         {
             switch(Game.direction){
-                case left  : _x += Game.width/2 + Tile.TILE_SIZE;
-                case up    : _y += Game.height/2 + Tile.TILE_SIZE;
-                case right : _x -= Game.width/2 - Tile.TILE_SIZE;
-                case down  : _y -= Game.height/2 - Tile.TILE_SIZE;
+                case right : _x -= Game.width/2 + Tile.TILE_SIZE*2;
+                case down  : _y -= Game.height/2 + Tile.TILE_SIZE*2;
+                case left  : _x += Game.width/2 + Tile.TILE_SIZE*2;
+                case up    : _y += Game.height/2 + Tile.TILE_SIZE*2;
             }
         }
         else if (spawn_type == fromSides)
@@ -74,14 +74,14 @@ class SpawnCruncher extends Action {
 
 
         // Round up the position
-        _x = Math.floor( _x/16 )*16;
-        _y = Math.floor( _y/16 )*16;
+        _x = Math.round( _x/16 )*16;
+        _y = Math.round( _y/16 )*16;
 
-        var s:Cruncher = new Cruncher({
+        var cruncher:Cruncher = new Cruncher({
             pos: new Vector( _x, _y ),
         });
 
-        s.add( new components.DestroyByDistance({distance: 300}) );
+        cruncher.add( new components.DestroyByDistance({distance: 300}) );
 
 
         // Set Vector speeds and direction
@@ -90,12 +90,12 @@ class SpawnCruncher extends Action {
             _v.y = -_v.y;
 
             // slower from front
-            _v.multiplyScalar(1.25);
+            _v.multiplyScalar(0.65);
         }
 
         if(spawn_type == fromBack){
             // faster from back (so they can catch up)
-            _v.multiplyScalar(2);
+            _v.multiplyScalar(2.2);
         }
 
 
@@ -103,7 +103,7 @@ class SpawnCruncher extends Action {
         || spawn_type == fromFront
         || spawn_type == fromBack)
         {
-            s.add( new components.Movement({velocity:_v}));
+            cruncher.add( new components.Movement({velocity:_v}));
         }
     }
 

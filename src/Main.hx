@@ -22,6 +22,7 @@ class Main extends luxe.Game
 
         // Enemies
         _config.preload.textures.push({ id:'assets/images/cruncher.gif' });
+        _config.preload.textures.push({ id:'assets/images/bomb.gif' });
 
         // HUD
         _config.preload.textures.push({ id:'assets/images/hud.gif' });

@@ -31,7 +31,7 @@ class DestroyByDistance extends Component
         {
             // entity.events.fire('destroy.bydistance');
             // trace('${entity.name} destroyed');
-            entity.destroy();
+            entity.destroy(true);
             // entity = null;
             _v = null;
         }

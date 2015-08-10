@@ -84,14 +84,14 @@ class Spawner extends Entity {
 
         for(i in -2...count+2)
         {
-            if(Math.random() > 0.9) continue;
+            if(Math.random() > 0.6) continue;
 
             if(col)
             {
                 if(Game.direction == left){
-                    _x = Luxe.camera.center.x - Game.width/2 - Tile.TILE_SIZE;
+                    _x = Luxe.camera.center.x - Game.width/2 - Tile.TILE_SIZE*2;
                 }else{
-                    _x = Luxe.camera.center.x + Game.width/2 + Tile.TILE_SIZE;
+                    _x = Luxe.camera.center.x + Game.width/2 + Tile.TILE_SIZE*2;
                 }
                 _y = Luxe.camera.center.y - Game.height/2 + i*Tile.TILE_SIZE;
             }
@@ -100,9 +100,9 @@ class Spawner extends Entity {
                 _x = Luxe.camera.center.x - Game.width/2 + i*Tile.TILE_SIZE;
 
                 if(Game.direction == up){
-                    _y = Luxe.camera.center.y - Game.height/2 - Tile.TILE_SIZE;
+                    _y = Luxe.camera.center.y - Game.height/2 - Tile.TILE_SIZE*2;
                 }else{
-                    _y = Luxe.camera.center.y + Game.height/2 + Tile.TILE_SIZE;
+                    _y = Luxe.camera.center.y + Game.height/2 + Tile.TILE_SIZE*2;
                 } 
             }
 
@@ -124,42 +124,51 @@ class Spawner extends Entity {
 
         var actions:Array<Action>;
 
-        // Spawn random crunchers
+        // Spawn stationary bombs
         actions = new Array<Action>();
 
-        actions.push(new actions.SpawnCruncher({delay: 1}));
-        actions.push(new actions.SpawnCruncher({delay: 1}));
-        actions.push(new actions.SpawnCruncher({delay: 1}));
-        actions.push(new actions.SpawnCruncher({delay: 1}));
-        actions.push(new actions.SpawnCruncher({delay: 3}));
-        for(i in 0...10){
-            actions.push(new actions.SpawnCruncher({delay: 0.5}));
-        }
+        actions.push(new actions.SpawnBomb({delay: 1}));
+        actions.push(new actions.SpawnBomb({delay: 1}));
+        actions.push(new actions.SpawnBomb({delay: 1}));
+        actions.push(new actions.SpawnBomb({delay: 1}));
+        actions.push(new actions.SpawnBomb({delay: 1}));
 
-        // sequences.push(new Sequence({actions: actions, delay: 3}) );
+        sequences.push(new Sequence({actions: actions, delay: 1}) );
 
 
         // Spawn FRONTAL Crunchers
         actions = new Array<Action>();
-
         for(i in 0...4){
             actions.push(new actions.SpawnCruncher({
                 delay: 1, spawn_type:fromFront
             }));
         }
-        // sequences.push(new Sequence({actions: actions, delay: 3}) );
+        sequences.push(new Sequence({actions: actions, delay: 2}) );
 
 
 
         // Spawn BACK Crunchers
         actions = new Array<Action>();
-
-        for(i in 0...7){
+        for(i in 0...5){
             actions.push(new actions.SpawnCruncher({
                 delay: 1.5, spawn_type:fromBack
             }));
         }
-        sequences.push(new Sequence({actions: actions, delay: 3}) );
+        sequences.push(new Sequence({actions: actions}) );
+
+
+
+        // Spawn BACK & FRONT Crunchers
+        actions = new Array<Action>();
+        for(i in 0...5){
+            actions.push(new actions.SpawnCruncher({
+                delay: 3, spawn_type:fromBack
+            }));
+            actions.push(new actions.SpawnCruncher({
+                delay: 0, spawn_type:fromFront
+            }));
+        }
+        sequences.push(new Sequence({actions: actions, delay: 2}) );
 
     }
 
