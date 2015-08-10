@@ -1,36 +1,52 @@
 
 class Sequence {
     
-    var action:Void->Void;
+    var actions:Array<Action>;
 
     // read by spawner.
     public var difficulty:Float;
-    public var delay:Float;
-
-
-    // Check if action fired.
-    @:isVar public var fired (default, null):Bool;
+    
+    var time:Float = 0;
+    
+    var duration:Float;
+    var delay:Float = 0;
+    var ending:Float = 0;
 
     public function new( options:SequenceOptions )
     {
-        fired = false;
-
-        delay = options.delay;
+        if(options.delay != null){
+            delay = options.delay;
+        }
+        if(options.ending != null){
+            ending = options.ending;
+        }
         action = options.action;
+        
+            // get sequence's duration
+        for(i in actions)
+        {
+            duration 
+        }
+        duration += delay + ending;
     }
-
-    public function fire()
+    
+    public function update(dt:Float)
     {
-        if(fired) return;
-
-        action();
-        fired = true;
+        time += dt;
+        
+        /*
+        if(something){
+            actions[current_action].update();
+        }
+        */
     }
 
 }
 
 typedef SequenceOptions = {
 
-    var action:Void->Void;
-    var delay:Float;
+    var actions:Array<Action>;
+    
+    @:optional var delay:Float;
+    @:optional var ending:Float;
 }
