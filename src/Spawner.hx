@@ -7,6 +7,10 @@ import luxe.Vector;
 class Spawner extends Entity {
     
     var sequences:Array<Sequence>;
+    var current_sequence:Int = 0;
+    
+        // holds temp time, of current sequence's duration
+    var sequence_duration:Float = 0;
 
     var time:Float = 0;
 
@@ -18,6 +22,7 @@ class Spawner extends Entity {
             spawn_tiles();
         });
         
+        pick_squence();
     }
 
 
@@ -26,9 +31,21 @@ class Spawner extends Entity {
         if(Game.playing && !Game.delayed)
         {
             time += dt;
+            
+            sequences[current_sequence].update(dt);
+            
+            if( sequences[current_sequence].finished )
+            {
+                pick_sequence();
+            }
         }
     }
 
+    function pick_sequence()
+    {
+        current_sequence = Math.floor( Math.random()*(sequences.length-1) );
+        sequence_duration = squences[current_sequence].duration;
+    }
 
     function spawn_tiles()
     {
