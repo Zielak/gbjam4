@@ -11,10 +11,10 @@ class Light extends Component{
     public static inline var MAX_SIZE:Float = 700;
     public static inline var MIN_SIZE:Float = 64;
 
-    var MIN_SIZE_MULT:Float = 7;
+    var MIN_SIZE_MULT:Float = 5;
     var MAX_SIZE_MULT:Float = 2;
 
-    var MIN_POS_MULT:Float = -3;
+    var MIN_POS_MULT:Float = -2;
     var MAX_POS_MULT:Float = -0.5;
 
     public var test:Bool = false;

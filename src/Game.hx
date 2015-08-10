@@ -51,11 +51,11 @@ class Game extends State {
     public static var GAL_MULT:Float = 0.015;
 
         // How much hope are we loosing each update?
-    public static var HOPE_MULT:Float = 0;//0.025;
+    public static var HOPE_MULT:Float = 0.025;
 
 
     public static var speed:Float = 60;
-        // Distance travelled
+        // Distance travelled (what)
     public static var distance:Float = 0;
         // Distance to Gal
     public static var distance_gal:Float = 1;
@@ -103,6 +103,8 @@ class Game extends State {
         create_hud();
         create_player();
         create_lightmask();
+
+        init_events();
 
         spawner = new Spawner({name: 'spawner'});
         _camTravelled = 0;
@@ -193,18 +195,30 @@ class Game extends State {
         }) );
     }
 
+    function init_events()
+    {
+        Luxe.events.listen('game.gal_distance.*', function(e:GameEvent){
+            if(e.gal_distance != null) Game.gal_distance += e.gal_distance;
+        });
+        Luxe.events.listen('game.hope.*', function(e:GameEvent){
+            if(e.hope != null) Game.hope += e.hope;
+        });
+    }
+
+
+
     function spam_tiles()
     {
         var _x:Float = 0;
         var _y:Float = 0;
         var _tile:Tile;
 
-        var xm:Int = Math.floor( Game.width / Tile.TILE_SIZE ) + 1;
-        var ym:Int = Math.floor( Game.height / Tile.TILE_SIZE ) + 1;
+        var xm:Int = Math.floor( Game.width / Tile.TILE_SIZE ) + 2;
+        var ym:Int = Math.floor( Game.height / Tile.TILE_SIZE ) + 2;
 
-        for(x in 0...xm){
-            for(y in 0...ym){
-                if(Math.random() > 0.9) continue;
+        for(x in -1...xm){
+            for(y in -1...ym){
+                if(Math.random() > 0.7) continue;
                 _x = x * Tile.TILE_SIZE;
                 _y = y * Tile.TILE_SIZE;
                 
@@ -297,4 +311,11 @@ enum Direction {
     down;
     right;
     up;
+}
+
+typedef GameEvent = {
+    @:optional var gal_distance:Float;
+    @:optional var hope:Float;
+    @:optional var difficulty:Float;
+
 }
