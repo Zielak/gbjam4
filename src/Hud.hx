@@ -251,8 +251,8 @@ class Hud extends Entity
 
     function update_hope_bar()
     {
-        hope_bar_line.size.x = Math.round( hp_size * Game.hope / 2 ) * 2;
-        hope_bar_line.uv.w = Math.round( hp_size * Game.hope / 2 ) * 2;
+        hope_bar_line.size.x = Math.round( hp_size * Maths.clamp(Game.hope, 0, 1) / 2 ) * 2;
+        hope_bar_line.uv.w = Math.round( hp_size * Maths.clamp(Game.hope, 0, 1) / 2 ) * 2;
     }
 
     function update_distance_bar()
