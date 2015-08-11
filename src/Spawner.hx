@@ -13,10 +13,13 @@ class Spawner extends Entity {
     var sequence_duration:Float = 0;
 
     var time:Float = 0;
+    var crate_cd:Float = 0;
+    var crate_max_cd:Float = 3;
 
     override function init()
     {
         time = 0;
+        next_crate_cd();
 
         populate_sequences();
 
@@ -40,6 +43,7 @@ class Spawner extends Entity {
         if(Game.playing && !Game.delayed)
         {
             time += dt;
+            crate_cd -= dt;
             
             if( sequences.length > 0 ){
                 if( sequences[current_sequence].update(dt) ){
@@ -121,6 +125,18 @@ class Spawner extends Entity {
             });
             // trace('tile spawned');
         }
+    }
+    
+    function next_crate_cd()
+    {
+        crate_cd = crate_max_cd + Math.random()*2;
+    }
+    
+    function spawn_crate()
+    {
+        // Spawn crate here!
+        
+        next_crate_cd();
     }
 
     // SHAME SHAME SHAME
