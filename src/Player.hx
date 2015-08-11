@@ -1,6 +1,7 @@
 
 package ;
 
+import components.Collider;
 import components.CrateHolder;
 import luxe.Rectangle;
 import luxe.Sprite;
@@ -24,7 +25,7 @@ class Player extends Sprite
     var dashspeed:Float     = 2;
 
     var dashcd:Float        = 0;
-    var dashcdmax:Float     = 3;
+    var dashcdmax:Float     = 1;
 
     var dashtime:Float      = 0;
     var dashtimemax:Float   = 0.3;
@@ -40,6 +41,7 @@ class Player extends Sprite
     var _angle:Float = 0;
 
     var input:Input;
+    var collider:Collider;
     var anim:SpriteAnimation;
     var crateHolder:CrateHolder;
 
@@ -59,8 +61,13 @@ class Player extends Sprite
         );
 
         input = new Input({name: 'input'});
-
         add(input);
+
+
+        collider = new Collider({
+            testAgainst: ['cruncher', 'bomb', 'crate'],
+        });
+        add(collider);
 
         // Animation
 
@@ -125,7 +132,6 @@ class Player extends Sprite
         if(Game.playing && !Game.delayed)
         {
 
-            setDashing(dt);
 
             if(!dashing){
                 setSpeed(dt);
@@ -137,8 +143,14 @@ class Player extends Sprite
 
             if(_angle != -1 && _speed > 0) velocity.angle2D = _angle;
 
+                // Dash stuff
+            setDashing(dt);
+
                 // Crate holder
+            // Bpressed for the throwing
             if(input.Bpressed) this.events.fire('input.Bpressed', {direction:velocity});
+            // B for the grabbin
+            if(input.B) this.events.fire('input.B');
 
                 // Update Bounds
             bounds.x = Luxe.camera.center.x - Game.width/2 + SIZE/2;
@@ -210,7 +222,7 @@ class Player extends Sprite
 
             if(dashcd <= 0
             && input.move
-            && input.Apressed
+            && input.A
             && !crateHolder.holding
             ){
                 startDashing();

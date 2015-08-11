@@ -46,6 +46,24 @@ class Cruncher extends Sprite
         anim.animation = 'walk';
         anim.play();
 
+
+        add( new components.Collider({
+            
+        }) );
+
+
+        events.listen('collision.hit', function(_)
+        {
+            Luxe.events.fire('spawn.puff', {
+                pos:pos.clone(), velocity: new Vector(0,1)});
+            Luxe.events.fire('spawn.puff', {
+                pos:pos.clone(), velocity: new Vector(1,0)});
+            Luxe.events.fire('spawn.puff', {
+                pos:pos.clone(), velocity: new Vector(0,-1)});
+            Luxe.events.fire('spawn.puff', {
+                pos:pos.clone(), velocity: new Vector(-1,0)});
+            destroy();
+        });
     }
 
     override public function ondestroy()
