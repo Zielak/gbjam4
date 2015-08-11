@@ -21,6 +21,8 @@ class Input extends Component
     // action button
     public var A:Bool  = false;
     public var B:Bool  = false;
+    public var Apressed:Bool  = false;
+    public var Bpressed:Bool  = false;
 
     override function init():Void
     {
@@ -55,7 +57,9 @@ class Input extends Component
         down = Luxe.input.inputdown('down');
 
         A  = Luxe.input.inputdown('A');
+        Apressed  = Luxe.input.inputpressed('A');
         B  = Luxe.input.inputdown('B');
+        Bpressed  = Luxe.input.inputpressed('B');
 
         if(left && right){
             left = right = false;

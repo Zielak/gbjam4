@@ -61,8 +61,6 @@ class Game extends State {
     public static var distance_gal:Float = 1;
 
     public static var direction:Direction = right;
-    var prevent_quick_dir_change:Float = 0;
-    var prevent_quick_dir_change_max:Float = 8;
     public static function directional_vector():Vector
     {
         var _vec:Vector = new Vector(speed,0);
@@ -252,8 +250,6 @@ class Game extends State {
             Luxe.camera.pos.x = Math.round(Luxe.camera.pos.x);
             Luxe.camera.pos.y = Math.round(Luxe.camera.pos.y);
 
-            direction_change(dt);
-
         }
 
         if(hope <= 0){
@@ -263,32 +259,6 @@ class Game extends State {
         // Game.hope = Math.sin(Game.time/2)/2 + 0.5;
     }
 
-
-    function direction_change(dt:Float)
-    {
-        prevent_quick_dir_change += dt;
-        if(prevent_quick_dir_change >= prevent_quick_dir_change_max)
-        {
-            if(Math.random() > 1)
-            {
-                var _d = Math.round( Math.random() );
-                switch(Game.direction)
-                {
-                    case right:
-                        Game.direction = (_d==1) ? up : down;
-                    case down:
-                        Game.direction = (_d==1) ? left : right;
-                    case left:
-                        Game.direction = (_d==1) ? up : down;
-                    case up:
-                        Game.direction = (_d==1) ? left : right;
-                }
-                prevent_quick_dir_change = 0;
-
-                Luxe.events.fire('game.directon.changed');
-            }
-        }
-    }
 
 
     // HAXXX

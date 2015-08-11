@@ -32,6 +32,7 @@ class Main extends luxe.Game
         // World
         _config.preload.textures.push({ id:'assets/images/tiles.gif' });
         _config.preload.textures.push({ id:'assets/images/lightmask.png' });
+        _config.preload.textures.push({ id:'assets/images/puff.gif' });
 
         _config.preload.shaders.push({
             id:"lowres", frag_id:"assets/shaders/lowres.glsl", vert_id:"default"

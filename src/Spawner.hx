@@ -23,6 +23,13 @@ class Spawner extends Entity {
         Luxe.events.listen('spawn.tilescolrow', function(_){
             spawn_tiles();
         });
+
+        Luxe.events.listen('spawn.puff', function(e:SpawnEvent){
+            var p:Puff = new Puff({pos:e.pos});
+            if(e.velocity != null){
+                p.add(new Movement({velocity:e.velocity}));
+            }
+        });
         
         pick_sequence();
     }
@@ -172,4 +179,10 @@ class Spawner extends Entity {
 
     }
 
+}
+
+typedef SpawnEvent = {
+    var pos:Vector;
+
+    @:optional var velocity:Vector;
 }

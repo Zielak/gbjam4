@@ -1,6 +1,7 @@
 
 package ;
 
+import components.CrateHolder;
 import luxe.Rectangle;
 import luxe.Sprite;
 import luxe.Vector;
@@ -19,6 +20,16 @@ class Player extends Sprite
     var accelerate:Float    = 8;
     var decelerate:Float    = 1;
 
+    var dashing:Bool        = false;
+    var dashspeed:Float     = 2;
+
+    var dashcd:Float        = 0;
+    var dashcdmax:Float     = 3;
+
+    var dashtime:Float      = 0;
+    var dashtimemax:Float   = 0.3;
+
+
     var velocity:Vector;
     var game_v:Vector;
     var realPos:Vector;
@@ -30,6 +41,7 @@ class Player extends Sprite
 
     var input:Input;
     var anim:SpriteAnimation;
+    var crateHolder:CrateHolder;
 
     override function init()
     {
@@ -70,6 +82,20 @@ class Player extends Sprite
                     "pingpong":"false",
                     "loop": "true",
                     "speed": "12"
+                },
+                "walk_crate" : {
+                    "frame_size":{ "x":"16", "y":"16" },
+                    "frameset": ["6","7","6","8"],
+                    "pingpong":"false",
+                    "loop": "true",
+                    "speed": "12"
+                },
+                "dash" : {
+                    "frame_size":{ "x":"16", "y":"16" },
+                    "frameset": ["5"],
+                    "pingpong":"false",
+                    "loop": "true",
+                    "speed": "12"
                 }
             }
         ';
@@ -79,6 +105,16 @@ class Player extends Sprite
         anim.play();
 
 
+        crateHolder = new CrateHolder();
+
+        this.events.listen('crate.grab', function(_){
+            anim.animation = 'walk_crate';
+            anim.play();
+        });
+        this.events.listen('crate.throw_away', function(_){
+            anim.animation = 'walk';
+            anim.play();
+        });
 
     } //ready
 
@@ -88,12 +124,21 @@ class Player extends Sprite
     {
         if(Game.playing && !Game.delayed)
         {
-            setSpeed(dt);
 
-            _angle = input.angle;
-            velocity.set_xy(_speed, 0);
+            setDashing(dt);
+
+            if(!dashing){
+                setSpeed(dt);
+                _angle = input.angle;
+                velocity.set_xy(_speed, 0);
+            }else{
+                velocity.set_xy(dashspeed, 0);
+            }
 
             if(_angle != -1 && _speed > 0) velocity.angle2D = _angle;
+
+                // Crate holder
+            if(input.Bpressed) this.events.fire('input.Bpressed', {direction:velocity});
 
                 // Update Bounds
             bounds.x = Luxe.camera.center.x - Game.width/2 + SIZE/2;
@@ -153,6 +198,48 @@ class Player extends Sprite
                 _speed = 0;
             }
         }
+    }
+
+    function setDashing(dt:Float)
+    {
+        if(dashing){
+            dashtime -= dt;
+            if(dashtime <= 0) stopDashing();
+        }else{
+            if(dashcd > 0) dashcd -= dt;
+
+            if(dashcd <= 0
+            && input.move
+            && input.Apressed
+            && !crateHolder.holding
+            ){
+                startDashing();
+            }
+        }
+    }
+
+    function startDashing()
+    {
+        dashing = true;
+        dashtime = dashtimemax;
+
+        Luxe.events.fire('spawn.puff', {
+            pos: pos.clone(),
+            velocity: Game.directional_vector(),
+        });
+
+        anim.animation = 'dash';
+        anim.play();
+    }
+
+    function stopDashing()
+    {
+        dashing = false;
+        dashtime = 0;
+        dashcd = dashcdmax;
+
+        anim.animation = 'walk';
+        anim.play();
     }
 
 
