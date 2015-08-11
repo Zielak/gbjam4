@@ -150,13 +150,13 @@ class Spawner extends Entity {
         // Spawn stationary bombs
         actions = new Array<Action>();
 
-        actions.push(new actions.SpawnBomb({delay: 1}));
-        actions.push(new actions.SpawnBomb({delay: 1}));
-        actions.push(new actions.SpawnBomb({delay: 1}));
-        actions.push(new actions.SpawnBomb({delay: 1}));
-        actions.push(new actions.SpawnBomb({delay: 1}));
+        actions.push(new actions.SpawnBomb({delay: 0.7}));
+        actions.push(new actions.SpawnBomb({delay: 0.7}));
+        actions.push(new actions.SpawnBomb({delay: 0.7}));
+        actions.push(new actions.SpawnBomb({delay: 0.7}));
+        actions.push(new actions.SpawnBomb({delay: 0.7}));
 
-        sequences.push(new Sequence({actions: actions, delay: 1}) );
+        sequences.push(new Sequence({actions: actions}) );
 
 
         // Spawn FRONTAL Crunchers
@@ -166,13 +166,13 @@ class Spawner extends Entity {
                 delay: 1, spawn_type:fromFront
             }));
         }
-        sequences.push(new Sequence({actions: actions, delay: 2}) );
+        sequences.push(new Sequence({actions: actions, delay: 0.5}) );
 
 
 
         // Spawn BACK Crunchers
         actions = new Array<Action>();
-        for(i in 0...5){
+        for(i in 0...4){
             actions.push(new actions.SpawnCruncher({
                 delay: 1.5, spawn_type:fromBack
             }));
@@ -191,7 +191,7 @@ class Spawner extends Entity {
                 delay: 0, spawn_type:fromFront
             }));
         }
-        sequences.push(new Sequence({actions: actions, delay: 2}) );
+        // sequences.push(new Sequence({actions: actions, delay: 2}) );
 
     }
 
