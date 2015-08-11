@@ -34,6 +34,7 @@ class Player extends Sprite
     var velocity:Vector;
     var game_v:Vector;
     var realPos:Vector;
+    var posTimer:snow.api.Timer;
 
     var bounds:Rectangle;
 
@@ -52,6 +53,7 @@ class Player extends Sprite
         velocity = new Vector(0,0);
         game_v = new Vector(0,0);
         realPos = pos.clone();
+        posTimer = Luxe.timer.schedule(1/60, update_pos, true);
 
         bounds = new Rectangle(
             SIZE/2,
@@ -172,20 +174,19 @@ class Player extends Sprite
             if( realPos.y > bounds.y + bounds.h ) realPos.y = bounds.y + bounds.h;
             if( realPos.y < bounds.y ) realPos.y = bounds.y;
 
-            pos.copy_from(realPos);
-            // pos = pos.int();
-            pos.x = Math.round(pos.x);
-            pos.y = Math.round(pos.y);
-
-            if(input.move){
-                // trace('player pos: ${pos.x}, ${pos.y}');
-            }
-
             // Animation
             anim.speed = 9 + 8*(1 - Game.hope);
         }else{
             // anim.speed = 0;
         }
+    }
+
+    function update_pos()
+    {
+        pos.copy_from(realPos);
+        // pos = pos.int();
+        pos.x = Math.round(pos.x);
+        pos.y = Math.round(pos.y);
     }
 
 

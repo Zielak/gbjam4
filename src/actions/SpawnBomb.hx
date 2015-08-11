@@ -34,6 +34,7 @@ class SpawnBomb extends Action {
 
         var bomb:Bomb = new Bomb({
             pos: new Vector( _x, _y),
+            scene: Game.scene,
         });
 
         // trace('${_x}, ${_y}');

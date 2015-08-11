@@ -17,7 +17,10 @@ class Tile extends Sprite {
     var tiles_x:Int;
     var tiles_y:Int;
 
-    var mover:Movement;
+    override public function ondestroy()
+    {
+        // mover = null;
+    }
     
     override public function new(options:TileOptions)
     {

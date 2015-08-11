@@ -79,6 +79,7 @@ class SpawnCruncher extends Action {
 
         var cruncher:Cruncher = new Cruncher({
             pos: new Vector( _x, _y ),
+            scene: Game.scene,
         });
 
         cruncher.add( new components.DestroyByDistance({distance: 300}) );

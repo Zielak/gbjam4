@@ -3,6 +3,7 @@ import components.Movement;
 import luxe.Input;
 import luxe.Color;
 import luxe.Rectangle;
+import luxe.Scene;
 import luxe.Sprite;
 import luxe.States;
 
@@ -10,6 +11,7 @@ import luxe.utils.Maths;
 import luxe.utils.Random;
 import luxe.Vector;
 import phoenix.Texture;
+import snow.api.Timer;
 
 class Game extends State {
 
@@ -26,10 +28,12 @@ class Game extends State {
 
     var _realCamPos:Vector;
     var _camTravelled:Float;
+    var camTimer:Timer;
 
     public static var random:Random;
 
-    // Gameplay time
+    public static var scene:Scene;
+
     public static var level:Int;
     public static var gameType:GameType;
 
@@ -84,10 +88,13 @@ class Game extends State {
 
         Game.random = new Random(Math.random());
 
+        Game.scene = new Scene('gamescene');
+
         Game.level = 1;
         Game.gameType = classic;
 
         _realCamPos = new Vector();
+        camTimer = Luxe.timer.schedule(1/60, update_camera, true);
     }
 
     override function onenter<T>(_:T) 
@@ -232,7 +239,7 @@ class Game extends State {
     {
         if(playing && !delayed)
         {
-            Game.hope -= dt * Game.HOPE_MULT;
+            // Game.hope -= dt * Game.HOPE_MULT;
             Game.time += dt;
             Game.distance += Game.speed * dt;
             Game.gal_distance -= dt * Game.GAL_MULT;
@@ -246,10 +253,6 @@ class Game extends State {
                 Luxe.events.fire('spawn.tilescolrow');
             }
 
-            Luxe.camera.pos.copy_from(_realCamPos);
-            Luxe.camera.pos.x = Math.round(Luxe.camera.pos.x);
-            Luxe.camera.pos.y = Math.round(Luxe.camera.pos.y);
-
         }
 
         if(hope <= 0){
@@ -257,6 +260,13 @@ class Game extends State {
         }
 
         // Game.hope = Math.sin(Game.time/2)/2 + 0.5;
+    }
+
+    function update_camera()
+    {
+        Luxe.camera.pos.copy_from(_realCamPos);
+        Luxe.camera.pos.x = Math.round(Luxe.camera.pos.x);
+        Luxe.camera.pos.y = Math.round(Luxe.camera.pos.y);
     }
 
 

@@ -7,10 +7,13 @@ import luxe.Component;
 import luxe.Entity;
 import luxe.options.ComponentOptions;
 import luxe.Sprite;
+import snow.api.Timer;
 import luxe.Vector;
 
 class Collider extends Component {
     
+    public static inline var STEP_TIMER:Float = 1/30;
+
     @:isVar public var shape (default, null):Shape;
 
     var sprite:Sprite;
@@ -18,6 +21,8 @@ class Collider extends Component {
     var testAgainst:Array<String>;
     var offset:Vector;
     var size:Vector;
+
+    var timer:Timer;
 
     var _entities:Array<Entity>;
 
@@ -44,8 +49,25 @@ class Collider extends Component {
         }
 
         super(options);
+
+        timer = Luxe.timer.schedule(STEP_TIMER, step, true);
     }
 
+    function step()
+    {
+
+        shape.position.copy_from(entity.pos);
+        // shape.position.add(offset);
+        // trace(shape);
+
+        if(testAgainst != null)
+        {
+            for(n in testAgainst)
+            {
+                test_collision(n);
+            }
+        }
+    }
 
     override function onadded()
     {
@@ -62,8 +84,19 @@ class Collider extends Component {
             sprite.pos.x - size.x/2,
             sprite.pos.y - size.y/2,
             size.x, size.y);
+    }
 
-
+    override function ondestroy()
+    {
+        timer.stop();
+        timer = null;
+        shape = null;
+        sprite = null;
+        testAgainst = null;
+        offset = null;
+        size = null;
+        _entities = null;
+        collision = null;
     }
 
     override function init()
@@ -73,16 +106,7 @@ class Collider extends Component {
 
     override function update(dt:Float)
     {
-        shape.position.copy_from(entity.pos);
-        shape.position.add(offset);
-
-        if(testAgainst != null)
-        {
-            for(n in testAgainst)
-            {
-                test_collision(n);
-            }
-        }
+        
     }
 
 
@@ -90,7 +114,11 @@ class Collider extends Component {
     {
         var _collider:Collider;
 
-        Luxe.scene.get_named_like( test_name, _entities );
+        _entities = new Array<Entity>();
+
+        Game.scene.get_named_like( test_name, _entities );
+
+        // trace('got: ${_entities.length} x ${test_name}');
 
         for(_entity in _entities)
         {
@@ -100,9 +128,11 @@ class Collider extends Component {
                 if(_collider != null){
                     collision = shape.test( _collider.shape );
                     
+                    trace('collision ${collision}');
                     if(collision == null) continue;
 
                     if(collision.overlap > 0){
+                        trace('got hit!');
                         _entity.events.fire('collision.hit');
 
                         entity.events.fire('collision.hit', {name:test_name});
