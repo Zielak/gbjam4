@@ -35,7 +35,12 @@ class CrateHolder extends Component {
             // Wait, am I holding anything?
             if(holding){
                 throw_away(e.direction);
-            }else{
+            }
+        });
+        entity.events.listen('input.B', function(e:CrateHolderEvents)
+        {
+            // Try grabbing those crates!
+            if(!holding){
                 try_grabbing();
             }
         });
