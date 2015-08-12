@@ -23,15 +23,26 @@ class Spawner extends Entity {
 
         populate_sequences();
 
-        Luxe.events.listen('spawn.tilescolrow', function(_){
+        Luxe.events.listen('spawn.tilescolrow', function(_)
+        {
             spawn_tiles();
         });
 
-        Luxe.events.listen('spawn.puff', function(e:SpawnEvent){
+        Luxe.events.listen('spawn.puff', function(e:SpawnEvent)
+        {
             var p:Puff = new Puff({pos:e.pos});
-            if(e.velocity != null){
-                p.add(new Movement({velocity:e.velocity}));
+            var _v:Vector;
+            if(e.velocity != null)
+            {
+                _v = e.velocity;
             }
+            else
+            {
+                _v = new Vector(e.speed, 0);
+                _v.angle2D = e.angle;
+            }
+
+            p.add(new Movement({velocity:_v}));
         });
         
         pick_sequence();
@@ -201,4 +212,6 @@ typedef SpawnEvent = {
     var pos:Vector;
 
     @:optional var velocity:Vector;
+    @:optional var speed:Float;
+    @:optional var angle:Float;
 }

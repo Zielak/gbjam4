@@ -11,10 +11,12 @@ import snow.api.Timer;
 import luxe.Vector;
 
 class Collider extends Component {
-    
+
     public static inline var STEP_TIMER:Float = 1/30;
 
     @:isVar public var shape (default, null):Shape;
+
+    public var enabled:Bool = true;
 
     var sprite:Sprite;
 
@@ -30,16 +32,11 @@ class Collider extends Component {
 
     override public function new(options:ColliderOptions)
     {
+
         options.name = 'collider';
 
         if(options.testAgainst != null){
             testAgainst = options.testAgainst;
-        }
-
-        if(options.offset != null){
-            offset = options.offset;
-        }else{
-            offset = new Vector();
         }
 
         if(options.size != null){
@@ -48,32 +45,23 @@ class Collider extends Component {
             size = new Vector();
         }
 
+        if(options.offset != null){
+            offset = options.offset;
+        }else{
+            offset = new Vector();
+        }
+
         super(options);
 
-        timer = Luxe.timer.schedule(STEP_TIMER, step, true);
     }
 
-    function step()
-    {
-
-        shape.position.copy_from(entity.pos);
-        // shape.position.add(offset);
-        // trace(shape);
-
-        if(testAgainst != null)
-        {
-            for(n in testAgainst)
-            {
-                test_collision(n);
-            }
-        }
-    }
 
     override function onadded()
     {
         sprite = cast(entity, Sprite);
-
         if(sprite == null) throw 'Use it on Sprites for now.';
+
+        timer = Luxe.timer.schedule(STEP_TIMER, step, true);
 
         if(size.length <= 0){
             size.x = sprite.size.x;
@@ -81,14 +69,15 @@ class Collider extends Component {
         }
 
         shape = Polygon.rectangle(
-            sprite.pos.x - size.x/2,
-            sprite.pos.y - size.y/2,
+            sprite.pos.x - size.x/2 + offset.x,
+            sprite.pos.y - size.y/2 + offset.y,
             size.x, size.y);
+        // trace('x: ${shape.position.x}, y: ${shape.position.y}, sx: ${size.x}, sy: ${size.y}');
     }
 
     override function ondestroy()
     {
-        timer.stop();
+        if(timer != null) timer.stop();
         timer = null;
         shape = null;
         sprite = null;
@@ -104,11 +93,25 @@ class Collider extends Component {
         _entities = new Array<Entity>();
     }
 
-    override function update(dt:Float)
-    {
-        
-    }
 
+
+
+    function step()
+    {
+
+        shape.x = sprite.pos.x + offset.x;
+        shape.y = sprite.pos.y + offset.y;
+        // shape.position.add(offset);
+        // trace(shape);
+
+        if(testAgainst != null && enabled)
+        {
+            for(n in testAgainst)
+            {
+                test_collision(n);
+            }
+        }
+    }
 
     function test_collision( test_name:String )
     {
@@ -125,18 +128,17 @@ class Collider extends Component {
             if(_entity.has('collider'))
             {
                 _collider = cast (_entity.get('collider'), Collider);
-                if(_collider != null){
+                if(_collider != null)
+                {
+                    // Other must be enabled
+                    if(!_collider.enabled) continue;
                     collision = shape.test( _collider.shape );
                     
-                    trace('collision ${collision}');
                     if(collision == null) continue;
 
-                    if(collision.overlap > 0){
-                        trace('got hit!');
-                        _entity.events.fire('collision.hit');
-
-                        entity.events.fire('collision.hit', {name:test_name});
-                    }
+                    // trace('got hit!');
+                    _entity.events.fire('collision.hit');
+                    entity.events.fire('collision.hit', {name:test_name});
                 }
             }
         }

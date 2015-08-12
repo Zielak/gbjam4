@@ -13,7 +13,6 @@ class Main extends luxe.Game
 
     var shader:Entity;
 
-
     override public function config( _config:AppConfig ) : luxe.AppConfig{
 
         // Player
@@ -47,6 +46,8 @@ class Main extends luxe.Game
         Luxe.renderer.clear_color = new Color().rgb(C.c1);
         Luxe.camera.zoom = 4;
         Luxe.camera.pos.set_xy( -Game.width*1.5, -Game.height*1.5 );
+
+        
 
         // Machines
         machine = new States({ name:'statemachine' });

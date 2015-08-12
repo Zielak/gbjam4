@@ -43,9 +43,9 @@ class Puff extends Sprite
         ';
 
         anim.add_from_json( animation_json );
-        anim.speed = 10 + Math.random()*6;
         anim.animation = 'idle';
         anim.play();
+        anim.speed = 12 + Math.random()*12;
 
         anim.add_event('idle',8,'puff.ends');
 

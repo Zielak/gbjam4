@@ -7,6 +7,7 @@ import luxe.Scene;
 import luxe.Sprite;
 import luxe.States;
 
+import luxe.collision.ShapeDrawerLuxe;
 import luxe.utils.Maths;
 import luxe.utils.Random;
 import luxe.Vector;
@@ -92,6 +93,9 @@ class Game extends State {
 
         Game.level = 1;
         Game.gameType = classic;
+
+
+        Game.drawer = new ShapeDrawerLuxe();
 
         _realCamPos = new Vector();
         camTimer = Luxe.timer.schedule(1/60, update_camera, true);
@@ -277,6 +281,17 @@ class Game extends State {
         if(event.keycode == Key.key_h){
             Game.hope = 1;
         }
+    }
+
+
+
+
+
+    public static var drawer:ShapeDrawerLuxe;
+
+    override function onrender()
+    {
+
     }
 }
 

@@ -1,6 +1,7 @@
 package actions;
 
 import Action.ActionOptions;
+import enemies.Cruncher;
 import luxe.Vector;
 
 class SpawnCruncher extends Action {

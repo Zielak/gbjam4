@@ -1,6 +1,7 @@
 package actions;
 
 import Action.ActionOptions;
+import enemies.Bomb;
 import luxe.Vector;
 
 class SpawnBomb extends Action {

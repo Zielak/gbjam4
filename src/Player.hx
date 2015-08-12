@@ -68,6 +68,8 @@ class Player extends Sprite
 
         collider = new Collider({
             testAgainst: ['cruncher', 'bomb', 'crate'],
+            size: new Vector(10,10),
+            offset: new Vector(0,0),
         });
         add(collider);
 
@@ -179,6 +181,8 @@ class Player extends Sprite
         }else{
             // anim.speed = 0;
         }
+
+        // draw_collider();
     }
 
     function update_pos()
@@ -236,6 +240,8 @@ class Player extends Sprite
         dashing = true;
         dashtime = dashtimemax;
 
+        collider.enabled = false;
+
         Luxe.events.fire('spawn.puff', {
             pos: pos.clone(),
             velocity: Game.directional_vector(),
@@ -251,9 +257,18 @@ class Player extends Sprite
         dashtime = 0;
         dashcd = dashcdmax;
 
+        collider.enabled = true;
+
         anim.animation = 'walk';
         anim.play();
     }
 
+
+    function draw_collider()
+    {
+        if(collider == null) return;
+
+        Game.drawer.drawShape( collider.shape );
+    }
 
 }
