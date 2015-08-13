@@ -29,6 +29,9 @@ class Light extends Component{
 
     var sprite:Sprite;
 
+    // Used to animate light expansion
+    var anim_float:Float = 0;
+
     override function onadded()
     {
         sprite = cast(entity, Sprite);
@@ -36,6 +39,10 @@ class Light extends Component{
 
         texture_w = sprite.texture.width;
         texture_h = sprite.texture.height;
+
+        Luxe.events.listen('crate.hit.enemy', function(_){
+            anim_float = 0.4;
+        });
     }
 
     override function onremoved()
@@ -49,11 +56,22 @@ class Light extends Component{
 
         size = Game.hope;
 
+        if(anim_float > 0){
+            anim_float -= dt;
+        }else if(anim_float < 0){
+            anim_float = 0;
+        }
+
+        size += anim_float;
+
+        sprite.color.a = Maths.clamp(size*2, 0.8, 1);
+
         if(test)
         {
             _t += dt;
             size = ( Math.sin(_t) /2 ) + 0.5;
         }
+
 
         sprite.uv.x = texture_w * Maths.lerp(MIN_POS_MULT, MAX_POS_MULT, size);
         sprite.uv.y = texture_h * Maths.lerp(MIN_POS_MULT, MAX_POS_MULT, size);

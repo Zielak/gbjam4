@@ -11,7 +11,7 @@ import luxe.Vector;
 class Tile extends Sprite {
     
     public static inline var TILE_SIZE:Float = 16;
-    public static inline var TILES_COUNT:Int = 12;
+    public static inline var TILES_COUNT:Int = 13;
 
     var tile_id:Int = -1;
     var tiles_x:Int;
@@ -25,7 +25,7 @@ class Tile extends Sprite {
     override public function new(options:TileOptions)
     {
         options.name_unique = true;
-        options.name = 'Tile';
+        options.name = 'tile';
         options.centered = true;
         options.texture = Luxe.resources.texture('assets/images/tiles.gif');
         options.texture.filter_mag = nearest;
@@ -34,7 +34,13 @@ class Tile extends Sprite {
         options.depth = 0;
 
 
-        super( options);
+        super(options);
+
+        if( Math.round( Math.random() ) > 0){
+            this.rotation_z = 90;
+            // this.origin.x += 1;
+            this.origin.y -= 1;
+        }
 
         if(options.tile_id != null)
         {

@@ -1,6 +1,7 @@
 package actions;
 
 import Action.ActionOptions;
+import luxe.tween.Actuate;
 import luxe.Vector;
 
 class ChangeDirection extends Action {
@@ -9,10 +10,13 @@ class ChangeDirection extends Action {
     var _spd:Float = 0;
 
 
+
     override public function action()
     {
         
+        trace('ChangeDirection?');
         _spd = Game.speed;
+        slow_down();
 
     }
 
@@ -20,11 +24,14 @@ class ChangeDirection extends Action {
 
     function slow_down()
     {
-
+        trace('ChangeDirection.slow_down');
+        Actuate.tween(Game, 0.5, {speed: 0})
+        .onComplete(change_direction);
     }
 
     function change_direction()
     {
+        trace('ChangeDirection.change_direction');
         
         var _d = Math.round( Math.random() );
 
@@ -42,11 +49,13 @@ class ChangeDirection extends Action {
 
         Luxe.events.fire('game.directon.changed');
 
+        restore_speed();
     }
 
     function restore_speed()
     {
-
+        trace('ChangeDirection.restore_speed');
+        Actuate.tween(Game, 1, {speed: _spd});
     }
 
 }

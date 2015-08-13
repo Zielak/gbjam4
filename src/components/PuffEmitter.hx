@@ -1,11 +1,19 @@
 package components;
 
 import luxe.Component;
+import luxe.Sprite;
 
 class PuffEmitter extends Component{
 
     var cd:Float = 0;
-    var max_cd:Float = 0.3;
+    var max_cd:Float = 0.15;
+
+    var sprite:Sprite;
+
+    override function onadded()
+    {
+        sprite = cast(entity, Sprite);
+    }
 
     override function init()
     {
@@ -23,7 +31,8 @@ class PuffEmitter extends Component{
 
     function puff()
     {
-        Luxe.events.fire('spawn.puff', {pos: entity.pos.clone()});
+
+        Luxe.events.fire('spawn.puff', {pos: entity.pos, depth: sprite.depth });
 
         cd = max_cd;
     }

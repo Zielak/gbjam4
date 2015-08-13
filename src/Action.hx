@@ -7,14 +7,20 @@ class Action {
     // Property to be read by sequence.
     @:isVar public var delay(default, null):Float;
 
-    // Check if action fired.
-    @:isVar public var fired (default, null):Bool;
+    // Wait for this action to finish?
+    @:isVar public var wait(default, null):Bool = false;
+
+    // Check if action finished.
+    @:isVar public var finished(default, null):Bool;
 
     public function new( options:ActionOptions )
     {
-        fired = false;
+        finished = false;
 
         delay = options.delay;
+        if(options.wait != null){
+            wait = options.wait;
+        }
     }
 
     public function update(dt:Float)
@@ -28,19 +34,34 @@ class Action {
 
     function fire()
     {
-        if(fired) return;
+        if(finished) return;
 
         action();
-        time = 0;
-        fired = true;
+        if(!wait) finish();
     }
 
+    /**
+     * Override it do create your own actions
+     */
     public function action() {}
 
+    /**
+     * Call to reset this action and maybe start over
+     */
     public function reset()
     {
         time = 0;
-        fired = false;
+        finished = false;
+    }
+
+    /**
+     * Used when action isn't autoplay (wait = true)
+     * and we're waiting for the final words
+     */
+    public function finish()
+    {
+        time = 0;
+        finished = true;
     }
 
 }
@@ -48,4 +69,6 @@ class Action {
 typedef ActionOptions = {
 
     var delay:Float;
+
+    @:optional var wait:Bool;
 }

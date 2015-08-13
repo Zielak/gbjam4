@@ -1,5 +1,6 @@
 
 import components.Movement;
+import luxe.Entity;
 import luxe.Input;
 import luxe.Color;
 import luxe.Rectangle;
@@ -40,9 +41,12 @@ class Game extends State {
 
     // is game on? If not, then it's probably preparing (startup stuff)
     public static var playing:Bool = false;
-
+    
     // quick delay during gameplay, like getting mushroom in Mario
     public static var delayed:Bool = false;
+
+    // Is tutorial sequence should be playing?
+    public static var tutorial:Bool = false;
 
     public static var difficulty:Float = 0;
     public static var time:Float = 0;
@@ -50,20 +54,19 @@ class Game extends State {
 
 
         // Distance to Gal
-    var gal_distance_start:Float = 0.8;
-    public static var gal_distance:Float = 0.8;
+    var gal_distance_start:Float;
+    public static var gal_distance:Float;
+
         // How fast are we running to her normally?
-    public static var GAL_MULT:Float = 0.015;
+    public static var gal_mult:Float;
 
         // How much hope are we loosing each update?
-    public static var HOPE_MULT:Float = 0.025;
+    public static var hope_mult:Float;
 
 
     public static var speed:Float = 60;
         // Distance travelled (what)
     public static var distance:Float = 0;
-        // Distance to Gal
-    public static var distance_gal:Float = 1;
 
     public static var direction:Direction = right;
     public static function directional_vector():Vector
@@ -82,9 +85,15 @@ class Game extends State {
         return _vec.clone();
     }
 
-    public function new()
+    public function new(options:GameOptions)
     {
         super({ name:'game' });
+
+        Game.gal_mult = options.gal_mult;
+        Game.hope_mult = options.hope_mult;
+        gal_distance_start = options.gal_distance_start;
+
+        Game.tutorial = options.tutorial;
 
 
         Game.random = new Random(Math.random());
@@ -93,7 +102,6 @@ class Game extends State {
 
         Game.level = 1;
         Game.gameType = classic;
-
 
         Game.drawer = new ShapeDrawerLuxe();
 
@@ -118,7 +126,6 @@ class Game extends State {
         spawner = new Spawner({name: 'spawner'});
         _camTravelled = 0;
 
-        spam_tiles();
 
         Luxe.timer.schedule(3, function(){
             playing = true;
@@ -153,9 +160,9 @@ class Game extends State {
         Luxe.events.fire('game.reset');
     }
 
-    function game_over()
+    function game_over(reason:String)
     {
-        Luxe.events.fire('game.over');
+        Luxe.events.fire('game.over.${reason}');
         playing = false;
     }
 
@@ -192,7 +199,7 @@ class Game extends State {
             size: new Vector(512,512),
             pos: player.pos.clone(),
             centered: true,
-            depth: 100
+            depth: 50
         });
         lightmask.add( new components.Follow({
             name: 'follow',
@@ -212,41 +219,31 @@ class Game extends State {
         Luxe.events.listen('game.hope.*', function(e:GameEvent){
             if(e.hope != null) Game.hope += e.hope;
         });
+
+        Luxe.events.listen('player.hit.enemy', function(_)
+        {
+            Game.gal_distance += 0.1;
+
+            Game.hope += 0.07;
+        });
+
+        Luxe.events.listen('crate.hit.enemy', function(_){
+            Game.hope += 0.25;
+        });
     }
-
-
-
-    function spam_tiles()
-    {
-        var _x:Float = 0;
-        var _y:Float = 0;
-        var _tile:Tile;
-
-        var xm:Int = Math.floor( Game.width / Tile.TILE_SIZE ) + 2;
-        var ym:Int = Math.floor( Game.height / Tile.TILE_SIZE ) + 2;
-
-        for(x in -1...xm){
-            for(y in -1...ym){
-                if(Math.random() > 0.7) continue;
-                _x = x * Tile.TILE_SIZE;
-                _y = y * Tile.TILE_SIZE;
-                
-                _tile = new Tile({
-                    pos: new Vector(_x, _y),
-                });
-            }
-        }
-    }
-
 
     override function update(dt:Float)
     {
-        if(playing && !delayed)
+        if(Game.playing && !Game.delayed)
         {
-            // Game.hope -= dt * Game.HOPE_MULT;
+            if(!Game.tutorial){
+                Game.hope -= dt * Game.hope_mult;
+            }else{
+                Game.hope += dt;
+            }
             Game.time += dt;
             Game.distance += Game.speed * dt;
-            Game.gal_distance -= dt * Game.GAL_MULT;
+            Game.gal_distance -= dt * Game.gal_mult;
 
             _realCamPos.x += Game.directional_vector().x * dt;
             _realCamPos.y += Game.directional_vector().y * dt;
@@ -259,10 +256,19 @@ class Game extends State {
 
         }
 
-        if(hope <= 0){
-            game_over();
-        }
+        if(!Game.tutorial){
+            if(Game.hope <= 0){
+                game_over('hope');
+            }
+            if(Game.hope > 1){
+                Game.hope = 1;
+            }
 
+            if(Game.gal_distance > 1){
+                game_over('distance');
+            }
+        }
+        
         // Game.hope = Math.sin(Game.time/2)/2 + 0.5;
     }
 
@@ -280,6 +286,10 @@ class Game extends State {
     {
         if(event.keycode == Key.key_h){
             Game.hope = 1;
+        }
+
+        if(event.keycode == Key.key_p){
+            Game.delayed = !Game.delayed;
         }
     }
 
@@ -313,4 +323,11 @@ typedef GameEvent = {
     @:optional var hope:Float;
     @:optional var difficulty:Float;
 
+}
+
+typedef GameOptions = {
+    var hope_mult:Float;
+    var gal_mult:Float;
+    var gal_distance_start:Float;
+    var tutorial:Bool;
 }

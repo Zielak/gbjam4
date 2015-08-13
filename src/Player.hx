@@ -17,15 +17,15 @@ class Player extends Sprite
     public static inline var SIZE:Float = 16;
 
     var movespeed:Float     = 0;
-    var maxmovespeed:Float  = 1;
-    var accelerate:Float    = 8;
-    var decelerate:Float    = 1;
+    var maxmovespeed:Float  = 1.5;
+    var accelerate:Float    = 6;
+    var decelerate:Float    = 4;
 
     var dashing:Bool        = false;
     var dashspeed:Float     = 2;
 
     var dashcd:Float        = 0;
-    var dashcdmax:Float     = 1;
+    var dashcdmax:Float     = 0.7;
 
     var dashtime:Float      = 0;
     var dashtimemax:Float   = 0.3;
@@ -67,7 +67,7 @@ class Player extends Sprite
 
 
         collider = new Collider({
-            testAgainst: ['cruncher', 'bomb', 'crate'],
+            testAgainst: ['cruncher', 'bomb'],
             size: new Vector(10,10),
             offset: new Vector(0,0),
         });
@@ -116,15 +116,21 @@ class Player extends Sprite
         anim.play();
 
 
-        crateHolder = new CrateHolder();
+        crateHolder = new CrateHolder({name:'crate_holder'});
+        add(crateHolder);
 
-        this.events.listen('crate.grab', function(_){
+
+        events.listen('crate.grab', function(_){
             anim.animation = 'walk_crate';
             anim.play();
         });
-        this.events.listen('crate.throw_away', function(_){
+        events.listen('crate.throw_away', function(_){
             anim.animation = 'walk';
             anim.play();
+        });
+
+        events.listen('collision.hit', function(_){
+            Luxe.events.fire('player.hit.enemy');
         });
 
     } //ready
@@ -150,11 +156,16 @@ class Player extends Sprite
                 // Dash stuff
             setDashing(dt);
 
-                // Crate holder
-            // Bpressed for the throwing
-            if(input.Bpressed) this.events.fire('input.Bpressed', {direction:velocity});
-            // B for the grabbin
-            if(input.B) this.events.fire('input.B');
+            if(!dashing){
+                if(input.Bpressed && crateHolder.holding){
+                    // Bpressed for the throwing
+                    events.fire('input.Bpressed', {direction:velocity.clone()});
+                }else if(input.B && !crateHolder.holding){
+                    // B for the grabbin
+                    events.fire('input.B');
+                }
+            }
+            
 
                 // Update Bounds
             bounds.x = Luxe.camera.center.x - Game.width/2 + SIZE/2;

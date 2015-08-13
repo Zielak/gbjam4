@@ -5,7 +5,7 @@ class Sequence {
     var current_action:Int = 0;
 
     // read by spawner.
-    public var difficulty:Float;
+    @:isVar public var difficulty (default, null):Float;
     
     var time:Float;
     
@@ -18,6 +18,8 @@ class Sequence {
     public function new( options:SequenceOptions )
     {
         actions = options.actions;
+
+        difficulty = options.difficulty;
 
         if(options.delay != null){
             delay = options.delay;
@@ -52,7 +54,7 @@ class Sequence {
                 finished = true;
             }else if(time > delay){
                 actions[current_action].update(dt);
-                if(actions[current_action].fired) next();
+                if(actions[current_action].finished) next();
             }
         }
         
@@ -86,6 +88,7 @@ class Sequence {
 typedef SequenceOptions = {
 
     var actions:Array<Action>;
+    var difficulty:Float;
     
     @:optional var delay:Float;
     @:optional var ending:Float;

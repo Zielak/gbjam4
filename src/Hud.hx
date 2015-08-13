@@ -7,6 +7,7 @@ import luxe.Input;
 import luxe.Rectangle;
 import luxe.Sprite;
 import luxe.Text;
+import luxe.tween.Actuate;
 import luxe.utils.Maths;
 import luxe.Vector;
 import luxe.Visual;
@@ -43,6 +44,10 @@ class Hud extends Entity
     var dist_bar_bg:Sprite;
     var dist_me:Sprite;
     var dist_gal:Sprite;
+
+    var dist_bar_bg_y:Float;
+    var dist_me_y:Float;
+    var dist_gal_y:Float;
     
 
     public var top_padding:Int = 12;
@@ -73,7 +78,34 @@ class Hud extends Entity
 
     function initEvents()
     {
+        Luxe.events.listen('player.hit.enemy', function(_)
+        {
+            // Animate DIST_ME
+            dist_me.pos.y -= 15;
+            Actuate.tween(dist_me.pos, 0.4, {y:dist_me_y})
+            .onUpdate(function(){
+                dist_me.pos.y = Math.round(dist_me.pos.y);
+            });
 
+            // Animate DIST_GAL
+            dist_gal.pos.y -= 15;
+            Actuate.tween(dist_gal.pos, 1, {y:dist_gal_y})
+            .onUpdate(function(){
+                dist_gal.pos.y = Math.round(dist_gal.pos.y);
+            });
+
+            // Animate DIST_BAR_BG
+            dist_bar_bg.pos.y -= 5;
+            Actuate.tween(dist_bar_bg.pos, 0.3, {y:dist_bar_bg_y})
+            .onUpdate(function(){
+                dist_bar_bg.pos.y = Math.floor(dist_bar_bg.pos.y)-0.5;
+            });
+        });
+
+
+        Luxe.events.listen('game.over', function(_){
+            hearth_anim.stop();
+        });
     }
 
 
@@ -138,10 +170,6 @@ class Hud extends Entity
         hearth_anim.add_from_json( animation_json );
         hearth_anim.animation = 'beat';
         hearth_anim.play();
-
-        Luxe.events.listen('game.over', function(_){
-            hearth_anim.stop();
-        });
     }
 
     function setup_hopebar()
@@ -188,7 +216,7 @@ class Hud extends Entity
         dist_me = new Sprite({
             name: 'dist_me',
             size: new Vector(10,10),
-            pos: new Vector(Game.width/2 - dist_bar_bg.size.x/2, Game.height - bot_padding-2),
+            pos: new Vector(Game.width/2 - dist_bar_bg.size.x/2, Game.height - bot_padding-3),
             texture: Luxe.resources.texture('assets/images/hud.gif'),
             uv: new Rectangle(0,19,10,10),
             depth: 2.1,
@@ -207,6 +235,9 @@ class Hud extends Entity
         });
         dist_gal.texture.filter_min = dist_gal.texture.filter_mag = FilterType.nearest;
 
+        dist_bar_bg_y = dist_bar_bg.pos.y;
+        dist_me_y = dist_me.pos.y;
+        dist_gal_y = dist_gal.pos.y;
 
         update_distance_bar();
 

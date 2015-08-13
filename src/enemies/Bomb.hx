@@ -46,7 +46,7 @@ class Bomb extends Enemy
 
 
         add( new components.Collider({
-            size: new Vector(10,10),
+            size: new Vector(8,8),
         }) );
 
 
@@ -60,6 +60,11 @@ class Bomb extends Enemy
                 pos:pos.clone(), velocity: new Vector(0,-30)});
             Luxe.events.fire('spawn.puff', {
                 pos:pos.clone(), velocity: new Vector(-30,0)});
+
+            Luxe.events.fire('spawn.flash', {
+                pos:pos.clone(), 
+            });
+
             destroy();
         });
 

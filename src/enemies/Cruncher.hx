@@ -46,7 +46,7 @@ class Cruncher extends Enemy
 
 
         add( new components.Collider({
-            size: new Vector(12,12),
+            size: new Vector(8,8),
         }) );
 
 

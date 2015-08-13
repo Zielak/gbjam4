@@ -15,6 +15,12 @@ class Main extends luxe.Game
 
     override public function config( _config:AppConfig ) : luxe.AppConfig{
 
+        // Screens
+        _config.preload.textures.push({ id:'assets/images/faderBlack.gif' });
+        _config.preload.textures.push({ id:'assets/images/intro_darekLogo.gif' });
+        _config.preload.textures.push({ id:'assets/images/intro_gbjam.gif' });
+        _config.preload.textures.push({ id:'assets/images/text.gif' });
+
         // Player
         _config.preload.textures.push({ id:'assets/images/player.gif' });
         _config.preload.textures.push({ id:'assets/images/gal.gif' });
@@ -22,6 +28,7 @@ class Main extends luxe.Game
         // Enemies
         _config.preload.textures.push({ id:'assets/images/cruncher.gif' });
         _config.preload.textures.push({ id:'assets/images/bomb.gif' });
+        _config.preload.textures.push({ id:'assets/images/crate.gif' });
 
         // HUD
         _config.preload.textures.push({ id:'assets/images/hud.gif' });
@@ -54,7 +61,12 @@ class Main extends luxe.Game
 
         // machine.add( new IntroState() );
         // machine.add( new MenuState() );
-        machine.add( new Game() );
+        machine.add( new Game({
+            gal_mult: 0.015,
+            gal_distance_start: 0.8,
+            hope_mult: 0.03,
+            tutorial: true,
+        }) );
         // machine.add( new GameOverState() );
         
         machine.set('game');

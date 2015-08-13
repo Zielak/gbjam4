@@ -115,6 +115,7 @@ class Collider extends Component {
 
     function test_collision( test_name:String )
     {
+
         var _collider:Collider;
 
         _entities = new Array<Entity>();
@@ -132,12 +133,23 @@ class Collider extends Component {
                 {
                     // Other must be enabled
                     if(!_collider.enabled) continue;
+
+                    if(this.entity.destroyed){
+                        trace('what happened?');
+                        break;
+                    }
+
                     collision = shape.test( _collider.shape );
                     
                     if(collision == null) continue;
 
                     // trace('got hit!');
-                    _entity.events.fire('collision.hit');
+                    
+                    _entity.events.fire('collision.hit', {
+                        coldata: collision,
+                        target: _entity,
+                    });
+
                     entity.events.fire('collision.hit', {name:test_name});
                 }
             }
@@ -154,4 +166,10 @@ typedef ColliderOptions = {
     @:optional var offset:Vector;
     @:optional var size:Vector;
     @:optional var testAgainst:Array<String>;
+}
+
+typedef ColliderEvent = {
+    var coldata:ShapeCollision;
+    @:optional var target:Entity;
+    @:optional var name:String;
 }

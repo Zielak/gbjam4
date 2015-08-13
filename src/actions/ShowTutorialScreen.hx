@@ -2,16 +2,18 @@ package actions;
 
 import Action.ActionOptions;
 import luxe.Input;
+import luxe.Rectangle;
 import luxe.Sprite;
+import luxe.tween.Actuate;
 import luxe.Vector;
-import phenix.Texture;
+import phoenix.Texture;
 import phoenix.geometry.Geometry;
 import snow.api.Timer;
 
 class ShowTutorialScreen extends Action {
 
     var screen:Sprite;
-    var _accept:Sprite;
+    var accept:Sprite;
     var can_close:Bool = false;
 
     var _texture:Texture;
@@ -24,42 +26,49 @@ class ShowTutorialScreen extends Action {
 
         _texture = Luxe.resources.texture(options.screen);
 
+        if(options.uv == null){
+            options.uv = new Rectangle(0,0,_texture.width, _texture.height);
+        }
+
         screen = new Sprite({
             name: 'screen',
             name_unique: true,
             texture: _texture,
-            pos: options.screen_pos,
-            size: new Vector(_texture.width,_texture.height),
-            centered: false,
-            depth: 15,
+            uv: options.uv,
+            pos: options.pos,
+            size: new Vector(options.uv.x,options.uv.y),
+            centered: true,
+            depth: 900,
         });
         screen.color.a = 0;
 
 
-        var va:Vector = new Vector(Game.width/2,Game.height*0.9);
+        var va:Vector = new Vector(Game.width/2 , Game.height*0.9);
         va.x = Math.round(va.x);
         va.y = Math.round(va.y);
 
-        _accept = new Sprite({
+        _texture = Luxe.resources.texture('assets/images/gal.gif');
+
+        accept = new Sprite({
             name: 'accept',
-            texture: Luxe.resources.texture('assets/images/accept.gif'),
-            pos: options.screen_pos,
-            size: va,
+            texture: _texture,
+            pos: va,
+            size: new Vector(_texture.width, _texture.height),
             centered: true,
-            depth: 15.1,
+            depth: 900.1,
         });
-        _accept.color.a = 0;
+        accept.color.a = 0;
 
     }
 
     override public function action()
     {
 
-        Game.paused = true;
+        Game.delayed = true;
 
         show_screen();
 
-        Luxe.timer.schedule(2, show_accept);
+        Luxe.timer.schedule(2, showaccept);
 
         // Pick random place in front of camera's center
 
@@ -68,13 +77,15 @@ class ShowTutorialScreen extends Action {
 
     function show_screen()
     {
+        screen.pos.y += 4;
         screen.color.tween(0.5, {a:1});
+        Actuate.tween(screen.pos, 0.8, {y: screen.pos.y-4});
     }
 
-    function show_accept()
+    function showaccept()
     {
         can_close = true;
-        _accept.color.a = 1;
+        accept.color.a = 1;
 
         timer = Luxe.timer.schedule(1/60, check_input, true);
     }
@@ -89,9 +100,16 @@ class ShowTutorialScreen extends Action {
 
     function hide_screen()
     {
-        _accept.color.a = 0;
-        destroy
-        screen.color.tween(0.7, {a:0});
+        Game.delayed = false;
+
+        accept.color.a = 0;
+        screen.color.tween(0.7, {a:0})
+        .onComplete(function(){
+            screen.destroy();
+            accept.destroy();
+        });
+
+        finish();
     }
 
 }
@@ -100,7 +118,8 @@ typedef ShowTutorialScreenOptions = {
     > ActionOptions,
 
     var screen:String;
-    var screen_pos:Vector;
+    var pos:Vector;
+    @:optional var uv:Rectangle;
 
     @:optional var circle_pos:Vector;
     @:optional var circle_size:Vector;
