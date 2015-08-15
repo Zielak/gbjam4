@@ -1,3 +1,4 @@
+import Action;
 
 class Sequence {
     
@@ -14,6 +15,11 @@ class Sequence {
     var ending:Float = 0;
 
     public var finished:Bool = false;
+
+    @:isVar public var action(get,null):Action;
+    function get_action():Action{
+        return actions[current_action];
+    }
 
     public function new( options:SequenceOptions )
     {
@@ -45,17 +51,22 @@ class Sequence {
     
     public function update(dt:Float):Bool
     {
+
         if(!finished)
         {
-            time += dt;
-
+            if( (action.wait && !action.fired) || !action.wait )
+            {
+                time += dt;
+            }
+            
             if(time >= duration){
                 // trace('sequence finished...');
                 finished = true;
-            }else if(time > delay){
-                actions[current_action].update(dt);
-                if(actions[current_action].finished) next();
+            }else if(time > delay && time < duration-ending){
+                action.update(dt);
+                if(action.finished) next();
             }
+            
         }
         
         return finished;

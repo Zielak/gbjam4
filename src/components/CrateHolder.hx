@@ -111,6 +111,7 @@ class CrateHolder extends Component {
         crate = cast(c, Crate);
 
         entity.events.fire('crate.grab');
+        Luxe.events.fire('player.grab.crate');
     }
 
     function throw_away(direction:Vector)
@@ -118,6 +119,8 @@ class CrateHolder extends Component {
         // trace('throw_away() dir: ${direction}');
         if(!holding) return;
         // trace('holding: ${holding}');
+
+        if(direction.length == 0 && Game.speed == 0) direction.x = -1;
 
         direction = direction.normalize();
         direction.multiplyScalar(THROW_SPEED);
@@ -154,6 +157,7 @@ class CrateHolder extends Component {
 
 
         entity.events.fire('crate.throw_away');
+        Luxe.events.fire('player.throw.crate');
 
     } 
 

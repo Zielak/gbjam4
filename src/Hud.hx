@@ -48,6 +48,10 @@ class Hud extends Entity
     var dist_bar_bg_y:Float;
     var dist_me_y:Float;
     var dist_gal_y:Float;
+
+
+    var love_txt:Text;
+    var distance_txt:Text;
     
 
     public var top_padding:Int = 12;
@@ -73,13 +77,26 @@ class Hud extends Entity
 
         initEvents();
 
-        setupHUD();
+        if(!Game.tutorial){
+            setupHUD();
+        }else{
+            Luxe.events.listen('hud.show.hope_bar', function(_){
+                setup_hopebar();
+                setup_hearth();
+            });
+            Luxe.events.listen('hud.show.distance_bar', function(_){
+                setup_distancebar();
+            });
+        }
+
     }
 
     function initEvents()
     {
         Luxe.events.listen('player.hit.enemy', function(_)
         {
+            if(Game.tutorial) return;
+
             // Animate DIST_ME
             dist_me.pos.y -= 15;
             Actuate.tween(dist_me.pos, 0.4, {y:dist_me_y})
@@ -116,7 +133,8 @@ class Hud extends Entity
         setup_hopebar();
         setup_hearth();
         if(Game.gameType == classic) setup_distancebar();
-
+        // setup_lovetxt();
+        // setup_distancetxt();
     }
 
     function setup_hearth()
@@ -243,15 +261,47 @@ class Hud extends Entity
 
     }
 
+    function setup_lovetxt()
+    {
+        love_txt = new Text({
+            bounds: new Rectangle(Game.width/2-90, top_padding+10, 90, 10),
+            batcher: hud_batcher,
+            color: new Color().rgb(C.c4),
+            point_size: 8,
+        });
+        
+    }
+    function update_lovetext()
+    {
+        distance_txt.text = 'distance: ${Math.round(Game.distance)}';
+    }
+
+    function setup_distancetxt()
+    {
+        distance_txt = new Text({
+            bounds: new Rectangle(Game.width/2 + 20, top_padding+10, 90 - 20, 10),
+            batcher: hud_batcher,
+            color: new Color().rgb(C.c4),
+            point_size: 8,
+        });
+    }
+    function update_distancetxt()
+    {
+        distance_txt.text = 'love: ${Math.round(Game.love)}';
+    }
+
     override function update(dt:Float):Void
     {
 
         if(Game.playing)
         {
-            choose_hearth_animation();
+            if(hearth != null) choose_hearth_animation();
 
-            update_hope_bar();
-            update_distance_bar();
+            if(hope_bar_bg != null) update_hope_bar();
+            if(dist_bar_bg != null) update_distance_bar();
+
+            // update_lovetext();
+            // update_distancetxt();
         }
     }
 

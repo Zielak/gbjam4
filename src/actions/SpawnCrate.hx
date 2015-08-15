@@ -1,7 +1,7 @@
 package actions;
 
 import Action.ActionOptions;
-import enemies.Bomb;
+import enemies.Crate;
 import luxe.Vector;
 
 class SpawnCrate extends Action {
@@ -26,13 +26,12 @@ class SpawnCrate extends Action {
             pos = Spawner.pick_place(front);
         }
 
-        var bomb:Bomb = new Bomb({
+        var bomb:Crate = new Crate({
             pos: pos,
             scene: Game.scene,
         });
 
         bomb.add( new components.DestroyByDistance({distance: 300}) );
-
     }
 
 }

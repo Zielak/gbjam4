@@ -52,8 +52,6 @@ class Movement extends Component
         //     case up:    velocity.angle2D = Math.PI/2;
         // }
 
-        // trace(velocity);
-
         realPos.x += velocity.x * dt;
         realPos.y += velocity.y * dt;
 

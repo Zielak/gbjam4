@@ -50,22 +50,13 @@ class Puff extends Sprite
         anim.add_event('idle',8,'puff.ends');
 
         this.events.listen('puff.ends', function(_){
-            // trace('puff ends');
             this.destroy();
-
-            // this.geometry.drop();
-            // 
-            // anim.stop();
-            // anim = null;
-            // remove('anim');
-            // anim = null;
         });
 
     }
 
     override function ondestroy()
     {
-        // trace('puff ondestroyed');
     }
 
 }

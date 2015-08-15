@@ -39,6 +39,7 @@ class Light extends Component{
 
         texture_w = sprite.texture.width;
         texture_h = sprite.texture.height;
+        sprite.color.a = 0.8;
 
         Luxe.events.listen('crate.hit.enemy', function(_){
             anim_float = 0.4;
@@ -64,7 +65,7 @@ class Light extends Component{
 
         size += anim_float;
 
-        sprite.color.a = Maths.clamp(size*2, 0.8, 1);
+        // sprite.color.a = Maths.clamp(size*2, 0.8, 1);
 
         if(test)
         {

@@ -59,12 +59,12 @@ class Main extends luxe.Game
         // Machines
         machine = new States({ name:'statemachine' });
 
-        // machine.add( new IntroState() );
+        machine.add( new IntroState() );
         // machine.add( new MenuState() );
         machine.add( new Game({
-            gal_mult: 0.015,
-            gal_distance_start: 0.8,
-            hope_mult: 0.03,
+            gal_mult: 0.008,
+            gal_distance_start: 0.95,
+            hope_mult: 0.1,
             tutorial: true,
         }) );
         // machine.add( new GameOverState() );
@@ -89,7 +89,7 @@ class Main extends luxe.Game
     override function onkeyup( e:KeyEvent ) {
 
         if(e.keycode == Key.escape) {
-            Luxe.shutdown();
+            // Luxe.shutdown();
         }
 
     } //onkeyup

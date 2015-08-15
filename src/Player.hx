@@ -22,17 +22,27 @@ class Player extends Sprite
     var decelerate:Float    = 4;
 
     var dashing:Bool        = false;
-    var dashspeed:Float     = 2;
+    var dashspeed:Float     = 1.8;
 
     var dashcd:Float        = 0;
     var dashcdmax:Float     = 0.7;
 
     var dashtime:Float      = 0;
-    var dashtimemax:Float   = 0.3;
+    var dashtimemax:Float   = 0.4;
 
 
     var velocity:Vector;
     var game_v:Vector;
+
+    @:isVar var all_velocity(get, null):Vector;
+    var _all_velocity:Vector;
+    function get_all_velocity():Vector
+    {
+        _all_velocity.copy_from(velocity);
+        _all_velocity.add(game_v);
+        return _all_velocity;
+    }
+
     var realPos:Vector;
     var posTimer:snow.api.Timer;
 
@@ -52,6 +62,8 @@ class Player extends Sprite
 
         velocity = new Vector(0,0);
         game_v = new Vector(0,0);
+        _all_velocity = new Vector(0,0);
+
         realPos = pos.clone();
         posTimer = Luxe.timer.schedule(1/60, update_pos, true);
 
@@ -107,6 +119,13 @@ class Player extends Sprite
                     "pingpong":"false",
                     "loop": "true",
                     "speed": "12"
+                },
+                "dash" : {
+                    "frame_size":{ "x":"16", "y":"16" },
+                    "frameset": ["5"],
+                    "pingpong":"false",
+                    "loop": "true",
+                    "speed": "12"
                 }
             }
         ';
@@ -120,17 +139,25 @@ class Player extends Sprite
         add(crateHolder);
 
 
-        events.listen('crate.grab', function(_){
-            anim.animation = 'walk_crate';
-            anim.play();
-        });
-        events.listen('crate.throw_away', function(_){
-            anim.animation = 'walk';
-            anim.play();
-        });
+        // events.listen('crate.grab', function(_){
+        //     anim.animation = 'walk_crate';
+        //     anim.play();
+        // });
+        // events.listen('crate.throw_away', function(_){
+        //     anim.animation = 'walk';
+        //     anim.play();
+        // });
 
         events.listen('collision.hit', function(_){
             Luxe.events.fire('player.hit.enemy');
+            if( !has('immortal') ) {
+                add( new components.Immortal({time:3}) );
+                add( new components.Blinking({
+                    time_off: 0.05,
+                    time_on: 0.1,
+                    remove_after: 3,
+                }) );
+            }
         });
 
     } //ready
@@ -188,7 +215,7 @@ class Player extends Sprite
             if( realPos.y < bounds.y ) realPos.y = bounds.y;
 
             // Animation
-            anim.speed = 9 + 8*(1 - Game.hope);
+            set_animation();
         }else{
             // anim.speed = 0;
         }
@@ -251,15 +278,17 @@ class Player extends Sprite
         dashing = true;
         dashtime = dashtimemax;
 
-        collider.enabled = false;
+        if(!has('immortal') ) collider.enabled = false;
 
         Luxe.events.fire('spawn.puff', {
             pos: pos.clone(),
             velocity: Game.directional_vector(),
         });
 
-        anim.animation = 'dash';
-        anim.play();
+        // anim.animation = 'dash';
+        // anim.play();
+
+        Luxe.events.fire('player.dash');
     }
 
     function stopDashing()
@@ -268,10 +297,55 @@ class Player extends Sprite
         dashtime = 0;
         dashcd = dashcdmax;
 
-        collider.enabled = true;
+        if(!has('immortal')) collider.enabled = true;
 
-        anim.animation = 'walk';
-        anim.play();
+        // anim.animation = 'walk';
+        // anim.play();
+    }
+
+    function set_animation()
+    {
+        if(all_velocity.length < 0.2)
+        {
+            if(!crateHolder.holding){
+                play_animation('idle');
+            }else{
+                anim.animation = 'walk_crate';
+                anim.frame = 1;
+                anim.stop();
+            }
+        }
+        else if(all_velocity.length >= 0.2)
+        {
+            // set anim speed
+            if(Game.speed < 0.5){
+                anim.speed = 12;
+            }else{
+                anim.speed = 9 + 8*(1 - Game.hope);
+            }
+
+            // Set animation
+            if(!crateHolder.holding){
+                if(!dashing){
+                    play_animation('walk');
+                }else{
+                    play_animation('dash');
+                }
+            }else{
+                play_animation('walk_crate');
+            }
+        }
+    }
+
+    function play_animation(_name:String)
+    {
+        if( !anim.playing ){
+            anim.play();
+        }
+        if( anim.animation != _name ){
+            anim.animation = _name;
+            anim.play();
+        }
     }
 
 

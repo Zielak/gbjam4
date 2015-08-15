@@ -12,22 +12,22 @@ class SpawnLineOfBomb extends Action {
         var bomb:Bomb;
         var v:Vector;
 
-        trace('place: ${Spawner.pick_place(front, false)}');
+        // trace('place: ${Spawner.pick_place(front, false)}');
 
         for(i in -7...8){
             v = Spawner.pick_place(front, false);
-            trace('BOMB ${i}');
+            // trace('BOMB ${i}');
 
             if(Game.direction == left || Game.direction == right){
-                trace('y: ${v.y}');
+                // trace('y: ${v.y}');
                 v.y += -Game.height*0.25 + i * Tile.TILE_SIZE;
                 v.y = Math.round( v.y/16 )*16;
-                trace(' -> y: ${v.y}');
+                // trace(' -> y: ${v.y}');
             }else{
-                trace('x: ${v.x}');
+                // trace('x: ${v.x}');
                 v.x += -Game.width*0.25  + i * Tile.TILE_SIZE;
                 v.x = Math.round( v.x/16 )*16;
-                trace(' -> x: ${v.x}');
+                // trace(' -> x: ${v.x}');
             }
 
 

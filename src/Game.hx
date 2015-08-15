@@ -51,6 +51,7 @@ class Game extends State {
     public static var difficulty:Float = 0;
     public static var time:Float = 0;
     public static var hope:Float = 1;
+    public static var love:Int = 0;
 
 
         // Distance to Gal
@@ -64,6 +65,7 @@ class Game extends State {
     public static var hope_mult:Float;
 
 
+    public static inline var SPEED_INIT:Float = 60;
     public static var speed:Float = 60;
         // Distance travelled (what)
     public static var distance:Float = 0;
@@ -83,6 +85,8 @@ class Game extends State {
         }
         // trace(_vec);
         return _vec.clone();
+
+        
     }
 
     public function new(options:GameOptions)
@@ -142,6 +146,7 @@ class Game extends State {
         Game.difficulty = 0;
         Game.time = 0;
         Game.hope = 1;
+        Game.love = 0;
         Game.gal_distance = gal_distance_start;
 
         Game.direction = right;
@@ -176,7 +181,6 @@ class Game extends State {
 
     function create_player()
     {
-        trace('game create_player');
 
         player = new Player({
             name: 'player',
@@ -188,7 +192,6 @@ class Game extends State {
         });
         player.texture.filter_mag = nearest;
         player.texture.filter_min = nearest;
-
     }
 
     function create_lightmask()
@@ -222,13 +225,14 @@ class Game extends State {
 
         Luxe.events.listen('player.hit.enemy', function(_)
         {
-            Game.gal_distance += 0.1;
-
-            Game.hope += 0.07;
+            Game.gal_distance += 0.08;
+            Game.hope -= 0.05;
+            Luxe.camera.shake(10);
         });
 
         Luxe.events.listen('crate.hit.enemy', function(_){
             Game.hope += 0.25;
+            Luxe.camera.shake(4);
         });
     }
 
@@ -237,18 +241,21 @@ class Game extends State {
         if(Game.playing && !Game.delayed)
         {
             if(!Game.tutorial){
-                Game.hope -= dt * Game.hope_mult;
+                Game.hope -= dt * ( Game.hope_mult * ( Game.difficulty*0.5 ) );
+                Game.distance += Game.speed * dt;
+                Game.gal_distance -= dt * Game.gal_mult;
             }else{
+                Game.gal_distance = gal_distance_start;
                 Game.hope += dt;
             }
+
             Game.time += dt;
-            Game.distance += Game.speed * dt;
-            Game.gal_distance -= dt * Game.gal_mult;
 
             _realCamPos.x += Game.directional_vector().x * dt;
             _realCamPos.y += Game.directional_vector().y * dt;
 
             _camTravelled += Game.directional_vector().length * dt;
+            
             if(_camTravelled > Tile.TILE_SIZE-1){
                 _camTravelled -= Tile.TILE_SIZE-1;
                 Luxe.events.fire('spawn.tilescolrow');
@@ -256,16 +263,21 @@ class Game extends State {
 
         }
 
+        if(Game.hope > 1){
+            Game.hope = 1;
+        }
+
         if(!Game.tutorial){
             if(Game.hope <= 0){
                 game_over('hope');
             }
-            if(Game.hope > 1){
-                Game.hope = 1;
+            if(Game.gal_distance > 1.1){
+                game_over('distance');
             }
 
-            if(Game.gal_distance > 1){
-                game_over('distance');
+            Game.difficulty = 1 - Game.gal_distance;
+            if(Game.difficulty > 1){
+                difficulty = 1;
             }
         }
         

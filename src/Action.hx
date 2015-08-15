@@ -5,13 +5,16 @@ class Action {
     var time:Float = 0;
 
     // Property to be read by sequence.
-    @:isVar public var delay(default, null):Float;
+    @:isVar public var delay(default, null):Float = 0;
 
     // Wait for this action to finish?
     @:isVar public var wait(default, null):Bool = false;
 
-    // Check if action finished.
-    @:isVar public var finished(default, null):Bool;
+    // Did action fired?
+    @:isVar public var fired(default, null):Bool = false;
+
+    // Check if action is completely finished
+    @:isVar public var finished(default, null):Bool = false;
 
     public function new( options:ActionOptions )
     {
@@ -25,6 +28,8 @@ class Action {
 
     public function update(dt:Float)
     {
+        if(fired) return;
+
         time += dt;
 
         if(time >= delay){
@@ -34,9 +39,10 @@ class Action {
 
     function fire()
     {
-        if(finished) return;
+        fired = true;
 
         action();
+
         if(!wait) finish();
     }
 
@@ -52,6 +58,7 @@ class Action {
     {
         time = 0;
         finished = false;
+        fired = false;
     }
 
     /**
