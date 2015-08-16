@@ -19,14 +19,18 @@ class SpawnBomb extends Action {
 
     override public function action()
     {
-        if(_pos == null){
-            _pos = Spawner.pick_place(front);
+        var bomb:Bomb;
+        if(_pos != null){
+            bomb = new Bomb({
+                pos: _pos,
+                scene: Game.scene,
+            });
+        }else{
+            bomb = new Bomb({
+                pos: Spawner.pick_place(front),
+                scene: Game.scene,
+            });
         }
-
-        var bomb:Bomb = new Bomb({
-            pos: _pos,
-            scene: Game.scene,
-        });
 
         bomb.add( new components.DestroyByDistance({distance: 300}) );
 

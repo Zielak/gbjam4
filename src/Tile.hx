@@ -17,10 +17,10 @@ class Tile extends Sprite {
     var tiles_x:Int;
     var tiles_y:Int;
 
-    override public function ondestroy()
-    {
-        // mover = null;
-    }
+    // override public function ondestroy()
+    // {
+    //     this.geometry.drop();
+    // }
     
     override public function new(options:TileOptions)
     {
@@ -50,6 +50,8 @@ class Tile extends Sprite {
         tiles_x = Math.floor(options.texture.width / TILE_SIZE); 
         tiles_y = Math.floor(options.texture.height / TILE_SIZE);
     }
+
+
 
 
     override function init()

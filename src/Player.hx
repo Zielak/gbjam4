@@ -85,6 +85,10 @@ class Player extends Sprite
         });
         add(collider);
 
+        add( new components.Immortal({
+            time: 9999999
+        }));
+
         // Animation
 
         anim = new SpriteAnimation({ name:'anim' });
@@ -120,12 +124,19 @@ class Player extends Sprite
                     "loop": "true",
                     "speed": "12"
                 },
-                "dash" : {
+                "death" : {
                     "frame_size":{ "x":"16", "y":"16" },
-                    "frameset": ["5"],
+                    "frameset": ["9-11","hold 2","12-14"],
+                    "pingpong":"false",
+                    "loop": "false",
+                    "speed": "14"
+                },
+                "deathsits" : {
+                    "frame_size":{ "x":"16", "y":"16" },
+                    "frameset": ["15-16"],
                     "pingpong":"false",
                     "loop": "true",
-                    "speed": "12"
+                    "speed": "8"
                 }
             }
         ';
@@ -138,16 +149,6 @@ class Player extends Sprite
         crateHolder = new CrateHolder({name:'crate_holder'});
         add(crateHolder);
 
-
-        // events.listen('crate.grab', function(_){
-        //     anim.animation = 'walk_crate';
-        //     anim.play();
-        // });
-        // events.listen('crate.throw_away', function(_){
-        //     anim.animation = 'walk';
-        //     anim.play();
-        // });
-
         events.listen('collision.hit', function(_){
             Luxe.events.fire('player.hit.enemy');
             if( !has('immortal') ) {
@@ -158,6 +159,11 @@ class Player extends Sprite
                     remove_after: 3,
                 }) );
             }
+        });
+
+
+        Luxe.events.listen('game.over.*', function(_){
+            play_animation('death');
         });
 
     } //ready

@@ -1,10 +1,14 @@
 
 import luxe.AppConfig;
 import luxe.Color;
+import luxe.components.sprite.SpriteAnimation;
 import luxe.Entity;
 import luxe.Input;
+import luxe.Sprite;
 import luxe.States;
+import luxe.Timer;
 import luxe.Vector;
+import phoenix.Texture;
 
 class Main extends luxe.Game
 {
@@ -17,9 +21,12 @@ class Main extends luxe.Game
 
         // Screens
         _config.preload.textures.push({ id:'assets/images/faderBlack.gif' });
+        _config.preload.textures.push({ id:'assets/images/rush_logo.gif' });
+        _config.preload.textures.push({ id:'assets/images/rush_logo_bg.gif' });
         _config.preload.textures.push({ id:'assets/images/intro_darekLogo.gif' });
         _config.preload.textures.push({ id:'assets/images/intro_gbjam.gif' });
         _config.preload.textures.push({ id:'assets/images/text.gif' });
+        _config.preload.textures.push({ id:'assets/images/help.gif' });
 
         // Player
         _config.preload.textures.push({ id:'assets/images/player.gif' });
@@ -33,13 +40,23 @@ class Main extends luxe.Game
         // HUD
         _config.preload.textures.push({ id:'assets/images/hud.gif' });
         _config.preload.textures.push({ id:'assets/images/hearth.gif' });
-        _config.preload.textures.push({ id:'assets/images/faderBlack.gif' });
 
         // World
         _config.preload.textures.push({ id:'assets/images/tiles.gif' });
         _config.preload.textures.push({ id:'assets/images/lightmask.png' });
         _config.preload.textures.push({ id:'assets/images/puff.gif' });
 
+
+
+        // Sounds
+        _config.preload.sounds.push({ id:'assets/sounds/Rush_Explosion.wav', name:'bomb', is_stream:false });
+        _config.preload.sounds.push({ id:'assets/sounds/Rush_Grab_Box.wav', name:'pickup', is_stream:false });
+        _config.preload.sounds.push({ id:'assets/sounds/Rush_Throw_Crate.wav', name:'throw', is_stream:false });
+        _config.preload.sounds.push({ id:'assets/sounds/Rush_Jump.wav', name:'jump', is_stream:false });
+        _config.preload.sounds.push({ id:'assets/sounds/cruncher_die.wav', name:'cruncher_die', is_stream:false });
+        _config.preload.sounds.push({ id:'assets/sounds/crate_break.wav', name:'create', is_stream:false });
+
+        // Shaders
         _config.preload.shaders.push({
             id:"lowres", frag_id:"assets/shaders/lowres.glsl", vert_id:"default"
         });
@@ -60,14 +77,14 @@ class Main extends luxe.Game
         machine = new States({ name:'statemachine' });
 
         machine.add( new IntroState() );
-        // machine.add( new MenuState() );
+        machine.add( new MenuState() );
         machine.add( new Game({
-            gal_mult: 0.008,
+            gal_mult: 0.0065,
             gal_distance_start: 0.95,
             hope_mult: 0.1,
-            tutorial: true,
+            tutorial: false,
         }) );
-        // machine.add( new GameOverState() );
+        machine.add( new GameOverState() );
         
         machine.set('game');
 
@@ -81,10 +98,26 @@ class Main extends luxe.Game
             pixel_size: new Vector( Game.width/Luxe.camera.zoom, Game.height/Luxe.camera.zoom ),
         }) );
 
-
-        // phoenix.Texture.default_filter = phoenix.Texture.FilterType.nearest;
+        init_events();
 
     } //ready
+
+    function init_events()
+    {
+        Luxe.events.listen('game.over.quit', function(_){
+            Luxe.timer.schedule(5, function(){
+                machine.set('gameover');
+            });
+        });
+
+        Luxe.events.listen('state.intro.finished', function(_){
+            machine.set('menu');
+        });
+
+        Luxe.events.listen('state.menu.finished', function(_){
+            machine.set('game');
+        });
+    }
 
     override function onkeyup( e:KeyEvent ) {
 
@@ -117,23 +150,6 @@ class Main extends luxe.Game
 } //Main
 
 
-class IntroState extends State {
-
-    public function new()
-    {
-        super({ name:'intro' });
-    }
-
-}
-
-class MenuState extends State {
-
-    public function new()
-    {
-        super({ name:'menu' });
-    }
-
-}
 
 
 class GameOverState extends State {

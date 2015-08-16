@@ -33,6 +33,10 @@ class Hud extends Entity
     // var textFieldPhys:Text;
     // var textFieldPhysString:String;
 
+
+    var fader:Sprite;
+    var fader_anim:SpriteAnimation;
+
     var hearth:Sprite;
     var hearth_anim:SpriteAnimation;
 
@@ -77,6 +81,8 @@ class Hud extends Entity
 
         initEvents();
 
+        setup_fader();
+
         if(!Game.tutorial){
             setupHUD();
         }else{
@@ -89,6 +95,29 @@ class Hud extends Entity
             });
         }
 
+    }
+
+    override function ondestroy()
+    {
+        fader.destroy();
+        fader_anim.stop();
+        hearth.destroy();
+        hearth_anim.stop();
+        hope_bar_bg.destroy();
+        hope_bar_line.destroy();
+        dist_bar_bg.destroy();
+        dist_me.destroy();
+        dist_gal.destroy();
+        
+        fader = null;
+        fader_anim = null;
+        hearth = null;
+        hearth_anim = null;
+        hope_bar_bg = null;
+        hope_bar_line = null;
+        dist_bar_bg = null;
+        dist_me = null;
+        dist_gal = null;
     }
 
     function initEvents()
@@ -115,26 +144,69 @@ class Hud extends Entity
             dist_bar_bg.pos.y -= 5;
             Actuate.tween(dist_bar_bg.pos, 0.3, {y:dist_bar_bg_y})
             .onUpdate(function(){
-                dist_bar_bg.pos.y = Math.floor(dist_bar_bg.pos.y)-0.5;
+                dist_bar_bg.pos.y = Math.floor(dist_bar_bg.pos.y);
             });
         });
 
 
-        Luxe.events.listen('game.over', function(_){
+        Luxe.events.listen('game.over.*', function(_){
             hearth_anim.stop();
         });
+
+
+
     }
 
 
 
     function setupHUD()
     {
-
         setup_hopebar();
         setup_hearth();
         if(Game.gameType == classic) setup_distancebar();
         // setup_lovetxt();
         // setup_distancetxt();
+    }
+
+    function setup_fader()
+    {
+        trace('setup_fader');
+        fader = new Sprite({
+            texture: Luxe.resources.texture('assets/images/faderBlack.gif'),
+            pos: camera.center,
+            size: new Vector(160, 144),
+            depth: 10,
+            batcher: hud_batcher,
+        });
+        fader.texture.filter_mag = fader.texture.filter_min = FilterType.nearest;
+
+        // Fader Animation
+
+        fader_anim = new SpriteAnimation({ name:'anim' });
+        fader.add( fader_anim );
+
+        var animation_json = '
+            {
+                "fadeout" : {
+                    "frame_size":{ "x":"160", "y":"144" },
+                    "frameset": ["6","5","4","3","2","1"],
+                    "pingpong":"false",
+                    "loop": "false",
+                    "speed": "16"
+                },
+                "fadein" : {
+                    "frame_size":{ "x":"160", "y":"144" },
+                    "frameset": ["1-6"],
+                    "pingpong":"false",
+                    "loop": "false",
+                    "speed": "16"
+                }
+            }
+        ';
+
+        fader_anim.add_from_json( animation_json );
+        fader_anim.animation = 'fadein';
+        fader_anim.play();
     }
 
     function setup_hearth()
@@ -222,10 +294,10 @@ class Hud extends Entity
     {
         dist_bar_bg = new Sprite({
             name: 'dist_bar_bg',
-            size: new Vector( 90,3 ),
-            pos: new Vector( Game.width/2, Game.height - bot_padding -0.5 ),
+            size: new Vector( 90,4 ),
+            pos: new Vector( Game.width/2, Game.height - bot_padding ),
             texture: Luxe.resources.texture('assets/images/hud.gif'),
-            uv: new Rectangle(0,16,90,3),
+            uv: new Rectangle(0,16,90,4),
             depth: 2,
             batcher: hud_batcher,
         });
@@ -233,10 +305,10 @@ class Hud extends Entity
 
         dist_me = new Sprite({
             name: 'dist_me',
-            size: new Vector(10,10),
+            size: new Vector(10,12),
             pos: new Vector(Game.width/2 - dist_bar_bg.size.x/2, Game.height - bot_padding-3),
             texture: Luxe.resources.texture('assets/images/hud.gif'),
-            uv: new Rectangle(0,19,10,10),
+            uv: new Rectangle(0,20,10,12),
             depth: 2.1,
             batcher: hud_batcher,
         });
@@ -244,10 +316,10 @@ class Hud extends Entity
 
         dist_gal = new Sprite({
             name: 'dist_gal',
-            size: new Vector(10,10),
+            size: new Vector(10,12),
             pos: new Vector(Game.width/2 + dist_bar_bg.size.x/2, Game.height - bot_padding-2),
             texture: Luxe.resources.texture('assets/images/hud.gif'),
-            uv: new Rectangle(9,19,10,10),
+            uv: new Rectangle(10,20,10,12),
             depth: 2.2,
             batcher: hud_batcher,
         });

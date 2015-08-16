@@ -16,6 +16,8 @@ class Spawner extends Entity {
     
     var sequences:Array<Sequence>;
     var current_sequence:Sequence;
+
+    var gameover_seq:Sequence;
     
         // holds temp time, of current sequence's duration
     var sequence_duration:Float = 0;
@@ -164,13 +166,20 @@ class Spawner extends Entity {
             var _v:Vector = Game.directional_vector();
             
             // _v.angle2D += Math.PI;
-            _v.length = 900;
+            _v.length = 750;
 
             for(t in _arr){
                 t.add(new components.Movement({velocity: _v}) );
             }
             tilespawn_density = 0.25;
             spam_tiles();
+        });
+
+        Luxe.events.listen('game.over.hope', function(_){
+            init_game_over_sequences('hope');
+        });
+        Luxe.events.listen('game.over.distance', function(_){
+            init_game_over_sequences('distance');
         });
     }
 
@@ -216,7 +225,7 @@ class Spawner extends Entity {
         actions.push(new actions.ShowTutorialScreen({
             delay: 0.5,
             screen: 'assets/images/text.gif',
-            uv: new Rectangle(0, 48, 64, 12),
+            uv: new Rectangle(0, 48, 94, 12),
             pos: new Vector(Game.width/2, 48),
             wait: true,
             wait_event: 'player.grab.crate',
@@ -306,7 +315,7 @@ class Spawner extends Entity {
         }));
 
 
-        sequences.push(new Sequence({actions: actions, difficulty: 0}) );
+        sequences.push(new Sequence({name: 'tutorial', actions: actions, difficulty: 0}) );
 
     }
 
@@ -317,6 +326,64 @@ class Spawner extends Entity {
         Luxe.events.fire('tutorial.finished');
 
         init_sequences();
+    }
+
+
+    function init_game_over_sequences(reason:String)
+    {
+
+        var arr:Array<Entity> = new Array<Entity>();
+        arr = Game.scene.get_named_like('cruncher', arr);
+        for(e in arr){
+            e.destroy();
+        }
+        arr = Game.scene.get_named_like('bomb', arr);
+        for(e in arr){
+            e.destroy();
+        }
+        arr = null;
+
+        var actions:Array<Action> = new Array<Action>();
+
+        // Speed
+        actions.push(new actions.ChangeSpeed({
+            target_speed: 0,
+            delay: 0,
+        }));
+
+        if(reason == 'hope')
+        {
+            actions.push(new actions.ShowTutorialScreen({
+                delay: 0.5,
+                screen: 'assets/images/text.gif',
+                uv: new Rectangle(0, 24, 108, 24),
+                pos: new Vector(Game.width/2, 48),
+                wait: true,
+                wait_input: true,
+            }));
+        }
+        else if(reason == 'distance')
+        {
+            actions.push(new actions.ShowTutorialScreen({
+                delay: 0.5,
+                screen: 'assets/images/text.gif',
+                uv: new Rectangle(0, 0, 86, 24),
+                pos: new Vector(Game.width/2, 48),
+                wait: true,
+                wait_input: true,
+            }));
+
+        }
+
+        actions.push(new actions.CustomAction({
+            delay: 1,
+            action: function(){
+                Luxe.events.fire('game.over.quit');
+            }
+        }));
+
+        gameover_seq = new Sequence({name:'game over', actions: actions, difficulty: -1});
+
     }
 
 
@@ -353,6 +420,14 @@ class Spawner extends Entity {
                 finish_tutorial();
             }
         }
+        if(!Game.playing && Game.gameover)
+        {
+            if(gameover_seq==null){
+
+            }else if( !gameover_seq.update(dt) ){
+                Luxe.events.fire('game.over.quit');
+            }
+        }
     }
 
     function pick_sequence()
@@ -380,11 +455,13 @@ class Spawner extends Entity {
             {
                 _seq = _ts[ Math.floor( Math.random()*(_ts.length) )] ;
             }
+            trace('SEQUENCE: chosen seq: "${_seq.name}" diff:${_seq.difficulty} ');
 
 
             current_sequence = _seq;
 
             sequence_duration = current_sequence.duration;
+            trace('SEQUENCE: sequence_duration = ${sequence_duration}');
             current_sequence.reset();
         }
     }
@@ -397,7 +474,6 @@ class Spawner extends Entity {
     {
         var _x:Float = 0;
         var _y:Float = 0;
-        var _tile:Tile;
 
         var xm:Int = Math.floor( Game.width / Tile.TILE_SIZE ) + 2;
         var ym:Int = Math.floor( Game.height / Tile.TILE_SIZE ) + 2;
@@ -408,7 +484,7 @@ class Spawner extends Entity {
                 _x = x * Tile.TILE_SIZE;
                 _y = y * Tile.TILE_SIZE;
                 
-                _tile = new Tile({
+                new Tile({
                     pos: new Vector(_x, _y),
                 });
             }
@@ -428,8 +504,6 @@ class Spawner extends Entity {
         var _w:Float;
         var _x:Float;
         var _y:Float;
-        var _tile:Tile;
-
         switch(Game.direction)
         {
             case right: 
@@ -477,7 +551,7 @@ class Spawner extends Entity {
             _x = Math.floor( _x/16 )*16;
             _y = Math.floor( _y/16 )*16;
 
-            _tile = new Tile({
+            new Tile({
                 pos: new Vector(_x, _y),
             });
         }
@@ -487,7 +561,7 @@ class Spawner extends Entity {
     
     function next_crate_cd()
     {
-        crate_cd = crate_max_cd + Math.random()*2 - Game.difficulty;
+        crate_cd = crate_max_cd + Math.random()*2 - Game.difficulty*1.3;
     }
     
     function spawn_crate()
@@ -511,59 +585,97 @@ class Spawner extends Entity {
 
         // | line of Bombs
         actions = new Array<Action>();
-        actions.push(new actions.SpawnLineOfBomb({delay: 2}));
-        sequences.push(new Sequence({actions: actions, ending: 1.5, difficulty: 0.15}) );
+        actions.push(new actions.SpawnLineOfBomb({delay: 0}));
+        sequences.push(new Sequence({name:'line of bombs', actions: actions, ending: 1.5, difficulty: 0.03}) );
+        sequences.push(new Sequence({name:'line of bombs', actions: actions, ending: 1.5, difficulty: 0.1}) );
+        sequences.push(new Sequence({name:'line of bombs', actions: actions, ending: 1.5, difficulty: 0.2}) );
 
-        // MORE lines of bombs
+        // | MORE lines of bombs
         actions = new Array<Action>();
-        actions.push(new actions.SpawnLineOfBomb({delay: 2}));
-        actions.push(new actions.SpawnLineOfBomb({delay: 3}));
-        actions.push(new actions.SpawnLineOfBomb({delay: 2}));
         actions.push(new actions.SpawnLineOfBomb({delay: 1}));
-        sequences.push(new Sequence({actions: actions, ending: 1.5, difficulty: 0.33}) );
+        actions.push(new actions.SpawnLineOfBomb({delay: 2}));
+        actions.push(new actions.SpawnLineOfBomb({delay: 1.5}));
+        actions.push(new actions.SpawnLineOfBomb({delay: 1}));
+        sequences.push(new Sequence({name:'MORE line of bombs', actions: actions, ending: 1.5, difficulty: 0.33}) );
 
 
         // HELL OF line bombs
         actions = new Array<Action>();
         actions.push(new actions.SpawnLineOfBomb({delay: 1}));
         actions.push(new actions.SpawnLineOfBomb({delay: 1.5}));
+        actions.push(new actions.SpawnCruncher({delay: 0.1, spawn_type: front}));
+        actions.push(new actions.SpawnCruncher({delay: 0.1, spawn_type: front}));
         actions.push(new actions.SpawnLineOfBomb({delay: 1.5}));
         actions.push(new actions.SpawnLineOfBomb({delay: 1.5}));
+        actions.push(new actions.SpawnCruncher({delay: 0.2, spawn_type: front}));
+        actions.push(new actions.SpawnCruncher({delay: 0.2, spawn_type: front}));
+        actions.push(new actions.SpawnCruncher({delay: 0.2, spawn_type: front}));
         actions.push(new actions.SpawnLineOfBomb({delay: 1.5}));
-        sequences.push(new Sequence({actions: actions, ending: 1.5, difficulty: 0.86}) );
+        sequences.push(new Sequence({name:'HELL line of bombs', actions: actions, ending: 1.5, difficulty: 0.7}) );
 
 
         // Spawn stationary bombs
         actions = new Array<Action>();
-        for(i in 0...5){
-            actions.push(new actions.SpawnBomb({delay: 0.85}));
+        for(i in 0...13){
+            actions.push(new actions.SpawnBomb({delay: 0.75}));
         }
-        sequences.push(new Sequence({actions: actions, difficulty: 0.1}) );
+        sequences.push(new Sequence({name:'bombs', actions: actions, difficulty: 0.03}) );
 
         // Spawn MORE BOMBS
         actions = new Array<Action>();
-        for(i in 0...10){
+        for(i in 0...18){
             actions.push(new actions.SpawnBomb({delay: 0.45}));
         }
-        sequences.push(new Sequence({actions: actions, difficulty: 0.35}) );
+        sequences.push(new Sequence({name:'MORE bombs',actions: actions, difficulty: 0.17}) );
 
         // BOMB HELL
         actions = new Array<Action>();
-        for(i in 0...10){
-            actions.push(new actions.SpawnBomb({delay: 0.3}));
+        for(i in 0...20){
+            actions.push(new actions.SpawnBomb({delay: 0.5}));
             actions.push(new actions.SpawnBomb({delay: 0}));
         }
-        sequences.push(new Sequence({actions: actions, difficulty: 0.55}) );
+        sequences.push(new Sequence({name:'HELL bombs',actions: actions, difficulty: 0.55}) );
 
 
         // UBER MENSH BOMBORDIER
         actions = new Array<Action>();
+        for(i in 0...16){
+            actions.push(new actions.SpawnBomb({delay: 0.3}));
+            actions.push(new actions.SpawnBomb({delay: 0}));
+            actions.push(new actions.SpawnCruncher({delay: 0.2, spawn_type: front}));
+        }
+        sequences.push(new Sequence({name:'UBER bombs',actions: actions, difficulty: 0.69}) );
+        sequences.push(new Sequence({name:'UBER bombs',actions: actions, difficulty: 0.9}) );
+
+
+
+
+
+
+
+        // HARDCORE MIX of Bombs and Crunchers!
+        actions = new Array<Action>();
+        for(i in 0...13){
+            actions.push(new actions.SpawnBomb({delay: 0.5}));
+            actions.push(new actions.SpawnBomb({delay: 0.2}));
+        }
+        actions.push(new actions.SpawnCruncher({delay: 0.3, spawn_type: back}));
+        actions.push(new actions.SpawnCruncher({delay: 0.1, spawn_type: front}));
+        actions.push(new actions.SpawnCruncher({delay: 0.1, spawn_type: back}));
+        for(i in 0...15){
+            actions.push(new actions.SpawnBomb({delay: 0.25}));
+            actions.push(new actions.SpawnBomb({delay: 0}));
+        }
+        actions.push(new actions.SpawnCruncher({delay: 0.3, spawn_type: front}));
+        actions.push(new actions.SpawnCruncher({delay: 0.1, spawn_type: back}));
+        actions.push(new actions.SpawnCruncher({delay: 0.1, spawn_type: front}));
         for(i in 0...15){
             actions.push(new actions.SpawnBomb({delay: 0.2}));
             actions.push(new actions.SpawnBomb({delay: 0}));
-            actions.push(new actions.SpawnBomb({delay: 0}));
         }
-        sequences.push(new Sequence({actions: actions, difficulty: 0.69}) );
+        sequences.push(new Sequence({name:'HARDCORE MIX',actions: actions, difficulty: 0.6}) );
+        sequences.push(new Sequence({name:'HARDCORE MIX',actions: actions, difficulty: 0.89}) );
+
 
 
 
@@ -576,7 +688,7 @@ class Spawner extends Entity {
                 delay: 1, spawn_type: front
             }));
         }
-        sequences.push(new Sequence({actions: actions, delay: 0.5, difficulty: 0.1}) );
+        sequences.push(new Sequence({name:'frontal crunchers',actions: actions, delay: 0.5, difficulty: 0.1}) );
 
         // Spawn more frontal Crunchers
         actions = new Array<Action>();
@@ -585,18 +697,7 @@ class Spawner extends Entity {
                 delay: 0.7, spawn_type: front
             }));
         }
-        sequences.push(new Sequence({actions: actions, delay: 0.25, difficulty: 0.35}) );
-
-
-        // Spawn HELL OF FRONTAL Crunchers
-        actions = new Array<Action>();
-        for(i in 0...6){
-            actions.push(new actions.SpawnCruncher({
-                delay: 0.4, spawn_type: front
-            }));
-        }
-        sequences.push(new Sequence({actions: actions, delay: 0.25, difficulty: 0.65}) );
-
+        sequences.push(new Sequence({name:'MORE frontal crunchers',actions: actions, delay: 0.25, difficulty: 0.35}) );
 
 
 
@@ -610,16 +711,7 @@ class Spawner extends Entity {
                 delay: 1.5, spawn_type: back
             }));
         }
-        sequences.push(new Sequence({actions: actions, difficulty: 0}) );
-
-        // Spawn MORE BACK Crunchers
-        actions = new Array<Action>();
-        for(i in 0...5){
-            actions.push(new actions.SpawnCruncher({
-                delay: 1, spawn_type: back
-            }));
-        }
-        sequences.push(new Sequence({actions: actions, difficulty: 0.3}) );
+        sequences.push(new Sequence({name:'back crunchers', actions: actions, difficulty: 0}) );
 
         // Spawn HELL of BACK Crunchers
         actions = new Array<Action>();
@@ -628,16 +720,7 @@ class Spawner extends Entity {
                 delay: 0.7, spawn_type: back
             }));
         }
-        sequences.push(new Sequence({actions: actions, difficulty: 0.7}) );
-
-        // Spawn UBER SPIEL of BACK Crunchers
-        actions = new Array<Action>();
-        for(i in 0...15){
-            actions.push(new actions.SpawnCruncher({
-                delay: 0.5, spawn_type: back
-            }));
-        }
-        sequences.push(new Sequence({actions: actions, difficulty: 0.9}) );
+        sequences.push(new Sequence({name:'HELL back crunchers', actions: actions, difficulty: 0.7}) );
 
 
 
@@ -647,7 +730,7 @@ class Spawner extends Entity {
 
         // Spawn BACK & FRONT Crunchers
         actions = new Array<Action>();
-        for(i in 0...5){
+        for(i in 0...10){
             actions.push(new actions.SpawnCruncher({
                 delay: 1, spawn_type: back
             }));
@@ -655,45 +738,34 @@ class Spawner extends Entity {
                 delay: 0, spawn_type: front
             }));
         }
-        sequences.push(new Sequence({actions: actions, delay: 0.5, difficulty: 0.2}) );
+        sequences.push(new Sequence({name:'front&back crunchers',actions: actions, delay: 0, difficulty: 0.2}) );
 
         // Spawn MORE BACK & FRONT Crunchers
         actions = new Array<Action>();
-        for(i in 0...5){
+        for(i in 0...12){
             actions.push(new actions.SpawnCruncher({
-                delay: 1.5, spawn_type: back
+                delay: 0.65, spawn_type: back
             }));
             actions.push(new actions.SpawnCruncher({
-                delay: 0, spawn_type: front
-            }));
-        }
-        sequences.push(new Sequence({actions: actions, delay: 0.5, difficulty: 0.35}) );
-
-
-        // Spawn HELL BACK & FRONT Crunchers
-        actions = new Array<Action>();
-        for(i in 0...7){
-            actions.push(new actions.SpawnCruncher({
-                delay: 0.5, spawn_type: back
-            }));
-            actions.push(new actions.SpawnCruncher({
-                delay: 0, spawn_type: front
+                delay: 0.1, spawn_type: front
             }));
         }
-        sequences.push(new Sequence({actions: actions, delay: 0.5, difficulty: 0.6}) );
+        sequences.push(new Sequence({name:'MORE front&back crunchers',actions: actions, delay: 0, difficulty: 0.4}) );
+
+
 
 
         // Spawn UBER SPIEL BACK & FRONT Crunchers
         actions = new Array<Action>();
-        for(i in 0...9){
+        for(i in 0...20){
             actions.push(new actions.SpawnCruncher({
-                delay: 0.25, spawn_type: back
+                delay: 0.5, spawn_type: back
             }));
             actions.push(new actions.SpawnCruncher({
-                delay: 0, spawn_type: front
+                delay: 0.2, spawn_type: front
             }));
         }
-        sequences.push(new Sequence({actions: actions, delay: 0.3, difficulty: 0.85}) );
+        sequences.push(new Sequence({name:'UBER SPIEL',actions: actions, delay: 0.3, difficulty: 0.83}) );
 
 
 
@@ -702,7 +774,7 @@ class Spawner extends Entity {
         actions = new Array<Action>();
         actions.push(new actions.ChangeDirection({delay: 1.5}));
         actions.push(new actions.Wait({delay: 2}));
-        sequences.push(new Sequence({actions: actions, difficulty: -1}) );
+        sequences.push(new Sequence({name:'change direction',actions: actions, difficulty: -1}) );
 
     }
 

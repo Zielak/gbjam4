@@ -34,23 +34,13 @@ class DestroyByDistance extends Component
         {
             // entity.events.fire('destroy.bydistance');
             // trace('${entity.name} destroyed');
-            entity.destroy();
-
             timer.stop();
             timer = null;
-
-            var sprite:Sprite = cast(entity, Sprite);
-            if( sprite != null ){
-                sprite.geometry.drop();
-            }
+            entity.destroy();
             entity = null;
         }
     }
 
-    override function update(dt:Float):Void
-    {
-
-    }
 
 }
 

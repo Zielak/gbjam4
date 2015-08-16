@@ -40,6 +40,13 @@ class Movement extends Component
         }
     } //ready
 
+    override function ondestroy()
+    {
+        velocity = null;
+        bounds = null;
+        killBounds = null;
+        realPos = null;
+    }
 
     override function update(dt:Float):Void
     {

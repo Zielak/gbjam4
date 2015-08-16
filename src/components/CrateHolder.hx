@@ -6,6 +6,7 @@ import components.PuffEmitter;
 import enemies.Crate;
 import luxe.Component;
 import luxe.Entity;
+import luxe.Sound;
 import luxe.Vector;
 
 class CrateHolder extends Component {
@@ -23,6 +24,9 @@ class CrateHolder extends Component {
     var cd_max:Float = 0.2;
 
     var crates:Array<Entity>;
+
+    var s_pickup:Sound;
+    var s_throw:Sound;
 
     var _player:Vector;
     var _v:Vector;
@@ -52,6 +56,22 @@ class CrateHolder extends Component {
                 try_grabbing();
             }
         });
+
+
+        s_pickup = Luxe.audio.get('pickup');
+        s_throw = Luxe.audio.get('throw');
+    }
+
+    override function ondestroy()
+    {
+        s_pickup.destroy();
+        s_pickup = null;
+        
+        s_throw.destroy();
+        s_throw = null;
+
+        _player = null;
+        _v = null;
     }
 
     override function update(dt:Float)
@@ -110,6 +130,9 @@ class CrateHolder extends Component {
 
         crate = cast(c, Crate);
 
+        s_pickup.pitch = Math.random()*0.2 + 0.9;
+        s_pickup.play();
+
         entity.events.fire('crate.grab');
         Luxe.events.fire('player.grab.crate');
     }
@@ -154,6 +177,10 @@ class CrateHolder extends Component {
         // and not removing it. Let it fly!!
         // crate = null;
         holding = false;
+
+
+        s_throw.pitch = Math.random()*0.2 + 0.9;
+        s_throw.play();
 
 
         entity.events.fire('crate.throw_away');

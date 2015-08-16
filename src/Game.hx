@@ -32,6 +32,12 @@ class Game extends State {
     var _camTravelled:Float;
     var camTimer:Timer;
 
+
+
+
+    // Just an array to hold all game's events, to remove
+    var game_events:Array<String>;
+
     public static var random:Random;
 
     public static var scene:Scene;
@@ -41,6 +47,9 @@ class Game extends State {
 
     // is game on? If not, then it's probably preparing (startup stuff)
     public static var playing:Bool = false;
+
+    // Did we just loose?
+    public static var gameover:Bool = false;
     
     // quick delay during gameplay, like getting mushroom in Mario
     public static var delayed:Bool = false;
@@ -113,11 +122,22 @@ class Game extends State {
         camTimer = Luxe.timer.schedule(1/60, update_camera, true);
     }
 
+    override function onleave<T>(_:T)
+    {
+        hud.destroy();
+        player.destroy();
+        lightmask.destroy();
+        kill_events();
+        spawner.destroy();
+        Game.scene.empty();
+        Luxe.scene.empty();
+
+        Luxe.camera.pos.set_xy( -Game.width*1.5, -Game.height*1.5 );
+    }
+
     override function onenter<T>(_:T) 
     {
 
-        // trace('bounds : ${bounds}');
-        // trace('Luxe.camera.pos : ${Luxe.camera.pos}');
 
         reset();
 
@@ -167,8 +187,9 @@ class Game extends State {
 
     function game_over(reason:String)
     {
+        Game.playing = false;
+        Game.gameover = true;
         Luxe.events.fire('game.over.${reason}');
-        playing = false;
     }
 
     function create_hud()
@@ -216,25 +237,37 @@ class Game extends State {
 
     function init_events()
     {
-        Luxe.events.listen('game.gal_distance.*', function(e:GameEvent){
-            if(e.gal_distance != null) Game.gal_distance += e.gal_distance;
-        });
-        Luxe.events.listen('game.hope.*', function(e:GameEvent){
-            if(e.hope != null) Game.hope += e.hope;
-        });
+        game_events = new Array<String>();
 
-        Luxe.events.listen('player.hit.enemy', function(_)
-        {
-            Game.gal_distance += 0.08;
+        game_events.push( Luxe.events.listen('game.gal_distance.*', function(e:GameEvent){
+            if(e.gal_distance != null) Game.gal_distance += e.gal_distance;
+        }) );
+        game_events.push( Luxe.events.listen('game.hope.*', function(e:GameEvent){
+            if(e.hope != null) Game.hope += e.hope;
+        }) );
+
+        game_events.push( Luxe.events.listen('player.hit.enemy', function(_){
+            Game.gal_distance += 0.06;
             Game.hope -= 0.05;
             Luxe.camera.shake(10);
-        });
+        }) );
 
-        Luxe.events.listen('crate.hit.enemy', function(_){
+        game_events.push( Luxe.events.listen('crate.hit.enemy', function(_){
+            Game.gal_distance -= 0.02;
             Game.hope += 0.25;
             Luxe.camera.shake(4);
-        });
+        }) );
     }
+
+    function kill_events()
+    {
+        for(s in game_events)
+        {
+            Luxe.events.unlisten(s);
+        }
+    }
+
+
 
     override function update(dt:Float)
     {
@@ -297,11 +330,11 @@ class Game extends State {
     override public function onkeydown( event:KeyEvent )
     {
         if(event.keycode == Key.key_h){
-            Game.hope = 1;
+            // Game.hope = 1;
         }
 
         if(event.keycode == Key.key_p){
-            Game.delayed = !Game.delayed;
+            // Game.delayed = !Game.delayed;
         }
     }
 

@@ -3,12 +3,17 @@ package enemies;
 import luxe.options.ComponentOptions;
 import luxe.options.SpriteOptions;
 import luxe.Rectangle;
+import luxe.Sound;
+import enemies.Enemy.SoundProp;
 import luxe.Sprite;
 import luxe.Vector;
 
 class Cruncher extends Enemy
 {
     
+
+    var s_death:Sound;
+    var s_death_vol:Float = 0.5;
 
     override public function new(options:CruncherOptions)
     {
@@ -52,16 +57,30 @@ class Cruncher extends Enemy
 
         events.listen('collision.hit', function(_)
         {
-            Luxe.events.fire('spawn.puff', {
-                pos:pos.clone(), speed: 25+Math.random()*25, angle: Math.random()*2*Math.PI});
-            Luxe.events.fire('spawn.puff', {
-                pos:pos.clone(), speed: 25+Math.random()*25, angle: Math.random()*2*Math.PI});
-            Luxe.events.fire('spawn.puff', {
-                pos:pos.clone(), speed: 25+Math.random()*25, angle: Math.random()*2*Math.PI});
-            Luxe.events.fire('spawn.puff', {
-                pos:pos.clone(), speed: 25+Math.random()*25, angle: Math.random()*2*Math.PI});
+            var sp:SoundProp = get_sound_prop();
+            s_death.pitch = Math.random()*0.4 + 0.8;
+            s_death.pan = sp.pan;
+            s_death.volume = sp.volume * s_death_vol;
+            s_death.play();
+            s_death = null;
+
             destroy();
         });
+
+        s_death = Luxe.audio.get('cruncher_die');
+    }
+
+
+    override function puff()
+    {
+        Luxe.events.fire('spawn.puff', {
+            pos:pos.clone(), speed: 25+Math.random()*25, angle: Math.random()*2*Math.PI});
+        Luxe.events.fire('spawn.puff', {
+            pos:pos.clone(), speed: 25+Math.random()*25, angle: Math.random()*2*Math.PI});
+        Luxe.events.fire('spawn.puff', {
+            pos:pos.clone(), speed: 25+Math.random()*25, angle: Math.random()*2*Math.PI});
+        Luxe.events.fire('spawn.puff', {
+            pos:pos.clone(), speed: 25+Math.random()*25, angle: Math.random()*2*Math.PI});
     }
 
 }

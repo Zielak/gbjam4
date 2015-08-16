@@ -1,14 +1,19 @@
 
 package enemies;
 
+import enemies.Enemy.SoundProp;
 import luxe.options.ComponentOptions;
 import luxe.options.SpriteOptions;
 import luxe.Rectangle;
 import luxe.Sprite;
+import luxe.Sound;
 import luxe.Vector;
 
 class Bomb extends Enemy
 {
+
+    var s_death:Sound;
+    var s_death_vol:Float = 0.5;
 
     override public function new(options:BombOptions)
     {
@@ -52,22 +57,41 @@ class Bomb extends Enemy
 
         events.listen('collision.hit', function(_)
         {
-            Luxe.events.fire('spawn.puff', {
-                pos:pos.clone(), velocity: new Vector(0,30)});
-            Luxe.events.fire('spawn.puff', {
-                pos:pos.clone(), velocity: new Vector(30,0)});
-            Luxe.events.fire('spawn.puff', {
-                pos:pos.clone(), velocity: new Vector(0,-30)});
-            Luxe.events.fire('spawn.puff', {
-                pos:pos.clone(), velocity: new Vector(-30,0)});
-
-            Luxe.events.fire('spawn.flash', {
-                pos:pos.clone(), 
-            });
+            var sp:SoundProp = get_sound_prop();
+            s_death.pitch = Math.random()*0.4 + 0.8;
+            s_death.pan = sp.pan;
+            s_death.volume = sp.volume * s_death_vol;
+            s_death.play();
+            s_death = null;
 
             destroy();
         });
 
+        s_death = Luxe.audio.get('bomb');
+
+    }
+
+    // override function ondestroy()
+    // {
+    //     super.ondestroy(); 
+    //     s_death = null;
+    // }
+
+
+    override function puff()
+    {
+        Luxe.events.fire('spawn.puff', {
+            pos:pos.clone(), velocity: new Vector(0,30)});
+        Luxe.events.fire('spawn.puff', {
+            pos:pos.clone(), velocity: new Vector(30,0)});
+        Luxe.events.fire('spawn.puff', {
+            pos:pos.clone(), velocity: new Vector(0,-30)});
+        Luxe.events.fire('spawn.puff', {
+            pos:pos.clone(), velocity: new Vector(-30,0)});
+
+        Luxe.events.fire('spawn.flash', {
+            pos:pos.clone(), 
+        });
     }
 
 

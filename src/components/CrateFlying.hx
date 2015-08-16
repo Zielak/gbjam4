@@ -1,8 +1,9 @@
 package components;
 
+import luxe.Component;
 import luxe.Sprite;
 
-class CrateFlying extends luxe.Component
+class CrateFlying extends Component
 {
     
     var sprite:Sprite;
@@ -11,6 +12,11 @@ class CrateFlying extends luxe.Component
     {
         sprite = cast(entity, Sprite);
         sprite.depth = 100;
+    }
+
+    override function ondestroy()
+    {
+        sprite = null;
     }
 
 }

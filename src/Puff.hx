@@ -57,6 +57,7 @@ class Puff extends Sprite
 
     override function ondestroy()
     {
+        anim = null;
     }
 
 }

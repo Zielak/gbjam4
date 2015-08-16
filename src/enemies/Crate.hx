@@ -4,6 +4,8 @@ package enemies;
 import luxe.options.ComponentOptions;
 import luxe.options.SpriteOptions;
 import luxe.Rectangle;
+import luxe.Sound;
+import enemies.Enemy.SoundProp;
 import luxe.Sprite;
 import luxe.Vector;
 import luxe.components.sprite.SpriteAnimation;
@@ -11,6 +13,9 @@ import components.Collider;
 
 class Crate extends Enemy
 {
+
+    var s_death:Sound;
+    var s_death_vol:Float = 0.4;
     
     override public function new(options:SpriteOptions)
     {
@@ -57,44 +62,29 @@ class Crate extends Enemy
 
         events.listen('collision.hit', function(e:ColliderEvent)
         {
+            var sp:SoundProp = get_sound_prop();
+            s_death.pitch = Math.random()*0.4 + 0.8;
+            s_death.pan = sp.pan;
+            s_death.volume = sp.volume * s_death_vol;
+            s_death.play();
+
+
             Luxe.events.fire('crate.hit.enemy');
 
-
             Luxe.events.fire('spawn.puff', {
                 pos:pos.clone(), speed: 25+Math.random()*25, angle: Math.random()*2*Math.PI});
             Luxe.events.fire('spawn.puff', {
                 pos:pos.clone(), speed: 25+Math.random()*25, angle: Math.random()*2*Math.PI});
+            s_death = null;
             
             this.destroy();
-
-            // anim.animation = 'die';
-            // anim.play();
-
-            // this.remove('movement');
-            // this.remove('collider');
         });
 
-        // events.listen('die.finished', function(_){
-        //     trace('die.finished - stopped at: ${anim.frame} frame');
-        //     anim.stop();
-        //     // anim.remove_events('die', 7);
-        //     // anim = null;
-        //     // this.remove('anim');
-
-        //     Luxe.timer.schedule(0.1, function(){
-        //         this.destroy();
-        //     });
-        // });
-
+        s_death = Luxe.audio.get('create');
 
     }
 
-    // override public function ondestroy()
-    // {
-    //     anim.stop();
-    //     anim = null;
-    //     this.geometry.drop();
-    // }
+
 
 }
 

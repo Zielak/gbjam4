@@ -33,7 +33,9 @@ class Blinking extends luxe.Component {
 
         if(remove_after > 0){
             timer = Luxe.timer.schedule(remove_after, function(){
-                remove('blinking');
+                if(entity != null){
+                    entity.remove('blinking');
+                }
             });
         }
     }

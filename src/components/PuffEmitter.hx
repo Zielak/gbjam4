@@ -31,10 +31,15 @@ class PuffEmitter extends Component{
 
     function puff()
     {
-
         Luxe.events.fire('spawn.puff', {pos: entity.pos, depth: sprite.depth });
 
         cd = max_cd;
+    }
+
+    override function ondestroy()
+    {
+        sprite = null;
+        
     }
 
 }

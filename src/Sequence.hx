@@ -2,6 +2,10 @@ import Action;
 
 class Sequence {
     
+    // for debuging sake...
+    @:isVar public var name (default, null):String;
+
+
     var actions:Array<Action>;
     var current_action:Int = 0;
 
@@ -15,6 +19,7 @@ class Sequence {
     var ending:Float = 0;
 
     public var finished:Bool = false;
+    var wait_for_ending:Bool = true; // FUCK IT, no time
 
     @:isVar public var action(get,null):Action;
     function get_action():Action{
@@ -23,6 +28,8 @@ class Sequence {
 
     public function new( options:SequenceOptions )
     {
+        name = options.name;
+
         actions = options.actions;
 
         difficulty = options.difficulty;
@@ -54,17 +61,17 @@ class Sequence {
 
         if(!finished)
         {
+            if(time > duration){
+                // trace('sequence finished...');
+                finished = true;
+            }else if(time >= delay && time <= duration-ending){
+                action.update(dt);
+                if(action.finished) next();
+            }
+
             if( (action.wait && !action.fired) || !action.wait )
             {
                 time += dt;
-            }
-            
-            if(time >= duration){
-                // trace('sequence finished...');
-                finished = true;
-            }else if(time > delay && time < duration-ending){
-                action.update(dt);
-                if(action.finished) next();
             }
             
         }
@@ -90,6 +97,7 @@ class Sequence {
         current_action ++;
         if(current_action >= actions.length){
             finished = true;
+            current_action --;
         }
         // trace(' - Next action [${current_action}]');
     }
@@ -98,6 +106,7 @@ class Sequence {
 
 typedef SequenceOptions = {
 
+    var name:String;
     var actions:Array<Action>;
     var difficulty:Float;
     
