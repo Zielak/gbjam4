@@ -47,9 +47,13 @@ class Puff extends Sprite
         anim.play();
         anim.speed = 12 + Math.random()*12;
 
-        anim.add_event('idle',8,'puff.ends');
+        // anim.add_event('idle',8,'puff.ends');
 
-        this.events.listen('puff.ends', function(_){
+        // this.events.listen('puff.ends', function(_){
+        //     this.destroy();
+        // });
+
+        Luxe.timer.schedule(0.5, function(){
             this.destroy();
         });
 
@@ -58,6 +62,7 @@ class Puff extends Sprite
     override function ondestroy()
     {
         anim = null;
+        super.ondestroy();
     }
 
 }

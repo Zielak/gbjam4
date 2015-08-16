@@ -1,4 +1,5 @@
 import luxe.Rectangle;
+import luxe.Sound;
 import luxe.States;
 import luxe.Color;
 import luxe.components.sprite.SpriteAnimation;
@@ -25,6 +26,8 @@ class MenuState extends State {
     var showing_help:Bool;
     var input_wait:Bool;
 
+    var s_start:Sound;
+
     public function new()
     {
         super({ name:'menu' });
@@ -34,9 +37,16 @@ class MenuState extends State {
 
     override function onenter<T>(_:T) 
     {
+
+        Luxe.renderer.clear_color = new Color().rgb(C.c1);
+        Luxe.camera.pos.set_xy( -Game.width*1.5, -Game.height*1.5 );
+
+
         timer = new Timer(Luxe.core);
         showing_help = false;
         input_wait = true;
+
+        s_start = Luxe.audio.get('start');
 
         bg = new Sprite({
             texture: Luxe.resources.texture('assets/images/rush_logo_bg.gif'),
@@ -188,6 +198,9 @@ class MenuState extends State {
 
     function start_game()
     {
+        Luxe.events.fire('state.menu.start_game');
+        s_start.play();
+
         shine.color.a = 0.7;
         shine.color.tween(0.5, {a: 0});
 

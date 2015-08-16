@@ -12,7 +12,7 @@ import luxe.Visual;
 class Spawner extends Entity {
 
     var tilespawn_density:Float;
-    var tilespawn_density_max:Float = 0.8;
+    var tilespawn_density_max:Float = 0.65;
     
     var sequences:Array<Sequence>;
     var current_sequence:Sequence;
@@ -77,14 +77,14 @@ class Spawner extends Entity {
                 case up    : _y += Game.height/2 + Tile.TILE_SIZE*2;
             }
         }
-        else if (spawnPlace == sides)
+        else if (spawnPlace == left)
         {
-            // switch(Game.direction){
-            //     case left  : _x += Game.width/2 + Tile.TILE_SIZE;
-            //     case up    : _y += Game.height/2 + Tile.TILE_SIZE;
-            //     case right : _x -= Game.width/2 - Tile.TILE_SIZE;
-            //     case down  : _y -= Game.height/2 - Tile.TILE_SIZE;
-            // }
+            switch(Game.direction){
+                case left  : _x += Game.width/2 + Tile.TILE_SIZE;
+                case up    : _y += Game.height/2 + Tile.TILE_SIZE;
+                case right : _x -= Game.width/2 - Tile.TILE_SIZE;
+                case down  : _y -= Game.height/2 - Tile.TILE_SIZE;
+            }
         }
 
         // Round up the position
@@ -96,6 +96,7 @@ class Spawner extends Entity {
 
     override function init()
     {
+        trace('SPAWNER: init');
         time = 0;
         next_crate_cd();
         tilespawn_density = 0.3;
@@ -180,6 +181,10 @@ class Spawner extends Entity {
         });
         Luxe.events.listen('game.over.distance', function(_){
             init_game_over_sequences('distance');
+        });
+
+        this.events.listen('sequence.gal', function(_){
+            init_gal_sequences();
         });
     }
 
@@ -331,7 +336,7 @@ class Spawner extends Entity {
 
     function init_game_over_sequences(reason:String)
     {
-
+        trace('init_game_over_sequences');
         var arr:Array<Entity> = new Array<Entity>();
         arr = Game.scene.get_named_like('cruncher', arr);
         for(e in arr){
@@ -357,7 +362,7 @@ class Spawner extends Entity {
                 delay: 0.5,
                 screen: 'assets/images/text.gif',
                 uv: new Rectangle(0, 24, 108, 24),
-                pos: new Vector(Game.width/2, 48),
+                pos: new Vector(Game.width/2, 40),
                 wait: true,
                 wait_input: true,
             }));
@@ -368,7 +373,7 @@ class Spawner extends Entity {
                 delay: 0.5,
                 screen: 'assets/images/text.gif',
                 uv: new Rectangle(0, 0, 86, 24),
-                pos: new Vector(Game.width/2, 48),
+                pos: new Vector(Game.width/2, 40),
                 wait: true,
                 wait_input: true,
             }));
@@ -387,6 +392,36 @@ class Spawner extends Entity {
     }
 
 
+
+    function init_gal_sequences()
+    {
+        trace('init_gal_sequences');
+
+        var actions:Array<Action> = new Array<Action>();
+
+        // It's nice to see you
+        actions.push(new actions.ShowTutorialScreen({
+            delay: 4,
+            screen: 'assets/images/text.gif',
+            uv: new Rectangle(0, 144, 72, 24),
+            pos: new Vector(Game.width/2, 40),
+            wait: true,
+            wait_input: true,
+        }));
+        
+
+        actions.push(new actions.CustomAction({
+            delay: 1,
+            action: function(){
+                Luxe.events.fire('game.over.quit');
+            }
+        }));
+
+        gameover_seq = new Sequence({name:'game over gal', actions: actions, difficulty: -1});
+
+    }
+
+
     override function update(dt:Float)
     {
         if(Game.playing && !Game.delayed && !Game.tutorial)
@@ -395,7 +430,7 @@ class Spawner extends Entity {
             crate_cd -= dt;
 
             if(tilespawn_density < tilespawn_density_max){
-                tilespawn_density += dt/15;
+                tilespawn_density += dt/18;
             }
 
             if(crate_cd <= 0){
@@ -424,8 +459,12 @@ class Spawner extends Entity {
         {
             if(gameover_seq==null){
 
-            }else if( !gameover_seq.update(dt) ){
+            }
+            else if( gameover_seq.update(dt) )
+            {
+                trace('gonna fire event');
                 Luxe.events.fire('game.over.quit');
+                gameover_seq==null;
             }
         }
     }
@@ -448,20 +487,20 @@ class Spawner extends Entity {
                     _ts.push(s);
                 }
             }
-            trace('SEQUENCE: picked ${_ts.length} sequences by difficulty: ${Game.difficulty}');
+            // trace('SEQUENCE: picked ${_ts.length} sequences by difficulty: ${Game.difficulty}');
 
             // can't be the same as last one
             while(_seq == current_sequence)
             {
                 _seq = _ts[ Math.floor( Math.random()*(_ts.length) )] ;
             }
-            trace('SEQUENCE: chosen seq: "${_seq.name}" diff:${_seq.difficulty} ');
+            // trace('SEQUENCE: chosen seq: "${_seq.name}" diff:${_seq.difficulty} ');
 
 
             current_sequence = _seq;
 
             sequence_duration = current_sequence.duration;
-            trace('SEQUENCE: sequence_duration = ${sequence_duration}');
+            // trace('SEQUENCE: sequence_duration = ${sequence_duration}');
             current_sequence.reset();
         }
     }
@@ -472,6 +511,7 @@ class Spawner extends Entity {
      */
     function spam_tiles()
     {
+        // trace('spam tiles');
         var _x:Float = 0;
         var _y:Float = 0;
 
@@ -497,6 +537,7 @@ class Spawner extends Entity {
      */
     function spawn_tiles()
     {
+        // trace('spawn tiles');
         
         var col:Bool = false;
         var count:Int;
@@ -585,10 +626,11 @@ class Spawner extends Entity {
 
         // | line of Bombs
         actions = new Array<Action>();
-        actions.push(new actions.SpawnLineOfBomb({delay: 0}));
-        sequences.push(new Sequence({name:'line of bombs', actions: actions, ending: 1.5, difficulty: 0.03}) );
-        sequences.push(new Sequence({name:'line of bombs', actions: actions, ending: 1.5, difficulty: 0.1}) );
-        sequences.push(new Sequence({name:'line of bombs', actions: actions, ending: 1.5, difficulty: 0.2}) );
+        actions.push(new actions.SpawnLineOfBomb({delay: 0.5}));
+        sequences.push(new Sequence({name:'line of bombs', actions: actions,difficulty: 0.03}) );
+        sequences.push(new Sequence({name:'line of bombs', actions: actions,difficulty: 0.3}) );
+        sequences.push(new Sequence({name:'line of bombs', actions: actions,difficulty: 0.68}) );
+        sequences.push(new Sequence({name:'line of bombs', actions: actions,difficulty: 0.84}) );
 
         // | MORE lines of bombs
         actions = new Array<Action>();
@@ -601,6 +643,8 @@ class Spawner extends Entity {
 
         // HELL OF line bombs
         actions = new Array<Action>();
+        actions.push(new actions.SpawnCruncher({delay: 0.1, spawn_type: front}));
+        actions.push(new actions.SpawnCruncher({delay: 0.1, spawn_type: front}));
         actions.push(new actions.SpawnLineOfBomb({delay: 1}));
         actions.push(new actions.SpawnLineOfBomb({delay: 1.5}));
         actions.push(new actions.SpawnCruncher({delay: 0.1, spawn_type: front}));
@@ -617,9 +661,9 @@ class Spawner extends Entity {
         // Spawn stationary bombs
         actions = new Array<Action>();
         for(i in 0...13){
-            actions.push(new actions.SpawnBomb({delay: 0.75}));
+            actions.push(new actions.SpawnBomb({delay: 0.6}));
         }
-        sequences.push(new Sequence({name:'bombs', actions: actions, difficulty: 0.03}) );
+        sequences.push(new Sequence({name:'bombs', actions: actions, difficulty: 0.05}) );
 
         // Spawn MORE BOMBS
         actions = new Array<Action>();
@@ -630,7 +674,7 @@ class Spawner extends Entity {
 
         // BOMB HELL
         actions = new Array<Action>();
-        for(i in 0...20){
+        for(i in 0...16){
             actions.push(new actions.SpawnBomb({delay: 0.5}));
             actions.push(new actions.SpawnBomb({delay: 0}));
         }
@@ -639,13 +683,12 @@ class Spawner extends Entity {
 
         // UBER MENSH BOMBORDIER
         actions = new Array<Action>();
-        for(i in 0...16){
+        for(i in 0...13){
             actions.push(new actions.SpawnBomb({delay: 0.3}));
-            actions.push(new actions.SpawnBomb({delay: 0}));
+            actions.push(new actions.SpawnBomb({delay: 0.1}));
             actions.push(new actions.SpawnCruncher({delay: 0.2, spawn_type: front}));
         }
         sequences.push(new Sequence({name:'UBER bombs',actions: actions, difficulty: 0.69}) );
-        sequences.push(new Sequence({name:'UBER bombs',actions: actions, difficulty: 0.9}) );
 
 
 
@@ -657,21 +700,21 @@ class Spawner extends Entity {
         actions = new Array<Action>();
         for(i in 0...13){
             actions.push(new actions.SpawnBomb({delay: 0.5}));
-            actions.push(new actions.SpawnBomb({delay: 0.2}));
+            actions.push(new actions.SpawnBomb({delay: 0.3}));
         }
         actions.push(new actions.SpawnCruncher({delay: 0.3, spawn_type: back}));
         actions.push(new actions.SpawnCruncher({delay: 0.1, spawn_type: front}));
         actions.push(new actions.SpawnCruncher({delay: 0.1, spawn_type: back}));
         for(i in 0...15){
             actions.push(new actions.SpawnBomb({delay: 0.25}));
-            actions.push(new actions.SpawnBomb({delay: 0}));
+            actions.push(new actions.SpawnBomb({delay: 0.2}));
         }
         actions.push(new actions.SpawnCruncher({delay: 0.3, spawn_type: front}));
         actions.push(new actions.SpawnCruncher({delay: 0.1, spawn_type: back}));
         actions.push(new actions.SpawnCruncher({delay: 0.1, spawn_type: front}));
         for(i in 0...15){
             actions.push(new actions.SpawnBomb({delay: 0.2}));
-            actions.push(new actions.SpawnBomb({delay: 0}));
+            actions.push(new actions.SpawnBomb({delay: 0.2}));
         }
         sequences.push(new Sequence({name:'HARDCORE MIX',actions: actions, difficulty: 0.6}) );
         sequences.push(new Sequence({name:'HARDCORE MIX',actions: actions, difficulty: 0.89}) );
@@ -740,6 +783,8 @@ class Spawner extends Entity {
         }
         sequences.push(new Sequence({name:'front&back crunchers',actions: actions, delay: 0, difficulty: 0.2}) );
 
+
+
         // Spawn MORE BACK & FRONT Crunchers
         actions = new Array<Action>();
         for(i in 0...12){
@@ -757,7 +802,7 @@ class Spawner extends Entity {
 
         // Spawn UBER SPIEL BACK & FRONT Crunchers
         actions = new Array<Action>();
-        for(i in 0...20){
+        for(i in 0...30){
             actions.push(new actions.SpawnCruncher({
                 delay: 0.5, spawn_type: back
             }));
@@ -765,7 +810,7 @@ class Spawner extends Entity {
                 delay: 0.2, spawn_type: front
             }));
         }
-        sequences.push(new Sequence({name:'UBER SPIEL',actions: actions, delay: 0.3, difficulty: 0.83}) );
+        sequences.push(new Sequence({name:'UBER SPIEL',actions: actions, delay: 0.3, difficulty: 0.9}) );
 
 
 
@@ -773,7 +818,7 @@ class Spawner extends Entity {
         // Change direction
         actions = new Array<Action>();
         actions.push(new actions.ChangeDirection({delay: 1.5}));
-        actions.push(new actions.Wait({delay: 2}));
+        actions.push(new actions.Wait({delay: 1.5}));
         sequences.push(new Sequence({name:'change direction',actions: actions, difficulty: -1}) );
 
     }
@@ -794,4 +839,6 @@ enum SpawnPlace {
     front;
     back;
     sides;
+    left;
+    right;
 }

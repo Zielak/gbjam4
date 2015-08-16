@@ -12,8 +12,7 @@ import luxe.Vector;
 class Bomb extends Enemy
 {
 
-    var s_death:Sound;
-    var s_death_vol:Float = 0.5;
+    var s_death_vol:Float = 0.4;
 
     override public function new(options:BombOptions)
     {
@@ -46,6 +45,7 @@ class Bomb extends Enemy
         ';
 
         anim.add_from_json( animation_json );
+        if(this.destroyed) return;
         anim.animation = 'idle';
         anim.play();
 
@@ -58,25 +58,15 @@ class Bomb extends Enemy
         events.listen('collision.hit', function(_)
         {
             var sp:SoundProp = get_sound_prop();
-            s_death.pitch = Math.random()*0.4 + 0.8;
-            s_death.pan = sp.pan;
-            s_death.volume = sp.volume * s_death_vol;
-            s_death.play();
-            s_death = null;
+            Luxe.audio.pitch('bomb', Math.random()*0.4 + 0.8);
+            Luxe.audio.pan('bomb', sp.pan);
+            Luxe.audio.volume('bomb', sp.volume * s_death_vol);
+            Luxe.audio.play('bomb');
 
             destroy();
         });
 
-        s_death = Luxe.audio.get('bomb');
-
     }
-
-    // override function ondestroy()
-    // {
-    //     super.ondestroy(); 
-    //     s_death = null;
-    // }
-
 
     override function puff()
     {

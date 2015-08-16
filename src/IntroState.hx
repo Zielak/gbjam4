@@ -12,6 +12,7 @@ import phoenix.Texture;
 class IntroState extends State {
 
     var darek_logo:Sprite;
+    var music_by:Sprite;
     var gbjam_logo:Sprite;
 
     var fader:Sprite;
@@ -27,6 +28,9 @@ class IntroState extends State {
 
     override function onenter<T>(_:T) 
     {
+
+        Luxe.renderer.clear_color = new Color().rgb(C.c1);
+        Luxe.camera.pos.set_xy( -Game.width*1.5, -Game.height*1.5 );
 
         timer = new Timer(Luxe.core);
 
@@ -44,6 +48,14 @@ class IntroState extends State {
             depth: 2,
         });
         darek_logo.texture.filter_mag = darek_logo.texture.filter_min = FilterType.nearest;
+
+
+        music_by = new Sprite({
+            texture: Luxe.resources.texture('assets/images/intro_music.gif'),
+            pos: Luxe.camera.center,
+            depth: 2,
+        });
+        music_by.texture.filter_mag = music_by.texture.filter_min = FilterType.nearest;
 
 
         fader = new Sprite({
@@ -82,6 +94,7 @@ class IntroState extends State {
 
         gbjam_logo.color.a = 0;
         darek_logo.color.a = 0;
+        music_by.color.a = 0;
         seq1();
     }
 
@@ -89,10 +102,11 @@ class IntroState extends State {
     {
         gbjam_logo.destroy();
         darek_logo.destroy();
+        music_by.destroy();
         fader.destroy();
         timer = null;
     }
-
+        // GBJAM
     function seq1()
     {
         trace('seq1');
@@ -103,20 +117,19 @@ class IntroState extends State {
 
         fader_anim.play();
 
-        timer.schedule(2, function()
+        timer.schedule(1.5, function()
         {
             gbjam_logo.color.tween(1, {a:0});
 
-            // timer.schedule(0.5, function(){
-                fader_anim.animation = 'fadeout';
-                fader_anim.play();
-                timer.schedule(1, function(){
-                    seq2();
-                });
-            // });
+            fader_anim.animation = 'fadeout';
+            fader_anim.play();
+            timer.schedule(0.5, function(){
+                seq2();
+            });
         });
     }
 
+        // DAREK GREENLY
     function seq2()
     {
         trace('seq2');
@@ -127,23 +140,44 @@ class IntroState extends State {
 
         fader_anim.play();
 
-        timer.schedule(2, function()
+        timer.schedule(1.5, function()
         {
             darek_logo.color.tween(1, {a:0});
 
-            // timer.schedule(0.5, function(){
-                fader_anim.animation = 'fadeout';
-                fader_anim.play();
-                timer.schedule(1, function(){
-                    seq3();
-                });
-            // });
+            fader_anim.animation = 'fadeout';
+            fader_anim.play();
+            timer.schedule(0.5, function(){
+                seq3();
+            });
         });
     }
 
+        // PEDRO AVELAR
     function seq3()
     {
         trace('seq3');
+        fader_anim.animation = 'fadein';
+        fader_anim.play();
+
+        music_by.color.tween(1, {a:1});
+
+        fader_anim.play();
+
+        timer.schedule(1.5, function()
+        {
+            music_by.color.tween(1, {a:0});
+
+            fader_anim.animation = 'fadeout';
+            fader_anim.play();
+            timer.schedule(0.5, function(){
+                seq4();
+            });
+        });
+    }
+
+    function seq4()
+    {
+        trace('seq4');
 
         Luxe.events.fire('state.intro.finished');
     }

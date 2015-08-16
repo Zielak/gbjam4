@@ -14,13 +14,14 @@ class Tile extends Sprite {
     public static inline var TILES_COUNT:Int = 13;
 
     var tile_id:Int = -1;
-    var tiles_x:Int;
-    var tiles_y:Int;
+    // var tiles_x:Int;
+    // var tiles_y:Int;
 
-    // override public function ondestroy()
-    // {
-    //     this.geometry.drop();
-    // }
+    override public function ondestroy()
+    {
+        if(this.geometry != null) this.geometry.drop();
+        super.ondestroy();
+    }
     
     override public function new(options:TileOptions)
     {
@@ -47,8 +48,8 @@ class Tile extends Sprite {
             tile_id = options.tile_id;
         }
 
-        tiles_x = Math.floor(options.texture.width / TILE_SIZE); 
-        tiles_y = Math.floor(options.texture.height / TILE_SIZE);
+        // tiles_x = Math.floor(options.texture.width / TILE_SIZE); 
+        // tiles_y = Math.floor(options.texture.height / TILE_SIZE);
     }
 
 

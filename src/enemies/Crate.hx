@@ -13,9 +13,7 @@ import components.Collider;
 
 class Crate extends Enemy
 {
-
-    var s_death:Sound;
-    var s_death_vol:Float = 0.4;
+    var s_death_vol:Float = 0.6;
     
     override public function new(options:SpriteOptions)
     {
@@ -63,10 +61,10 @@ class Crate extends Enemy
         events.listen('collision.hit', function(e:ColliderEvent)
         {
             var sp:SoundProp = get_sound_prop();
-            s_death.pitch = Math.random()*0.4 + 0.8;
-            s_death.pan = sp.pan;
-            s_death.volume = sp.volume * s_death_vol;
-            s_death.play();
+            Luxe.audio.pitch('crate', Math.random()*0.4 + 0.8);
+            Luxe.audio.pan('crate', sp.pan);
+            Luxe.audio.volume('crate', sp.volume * s_death_vol);
+            Luxe.audio.play('crate');
 
 
             Luxe.events.fire('crate.hit.enemy');
@@ -75,12 +73,9 @@ class Crate extends Enemy
                 pos:pos.clone(), speed: 25+Math.random()*25, angle: Math.random()*2*Math.PI});
             Luxe.events.fire('spawn.puff', {
                 pos:pos.clone(), speed: 25+Math.random()*25, angle: Math.random()*2*Math.PI});
-            s_death = null;
             
             this.destroy();
         });
-
-        s_death = Luxe.audio.get('create');
 
     }
 

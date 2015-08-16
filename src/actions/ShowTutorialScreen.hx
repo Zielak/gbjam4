@@ -189,7 +189,7 @@ class ShowTutorialScreen extends Action {
 
     function hide_screen()
     {
-        trace('hide_screen()');
+        // trace('hide_screen()');
 
         if(wait_input){
             accept.color.a = 0;

@@ -20,11 +20,12 @@ class Enemy extends Sprite
 
     override public function ondestroy()
     {
-        super.ondestroy();
+        if(this.geometry != null) this.geometry.drop();
         puff();
+        if(anim != null) anim = null;
+        super.ondestroy();
         // if(anim != null) anim.stop();
         // remove('anim');
-        anim = null;
         // this.geometry.drop();
     }
 
@@ -35,7 +36,7 @@ class Enemy extends Sprite
     {
         var v:Vector = new Vector();
 
-        v = Vector.Subtract(Luxe.camera.center, this.pos);
+        v = Vector.Subtract(this.pos, Luxe.camera.center);
 
         return {
             volume: get_vol(v.length),
@@ -52,14 +53,6 @@ class Enemy extends Sprite
 
     function get_pan(v:Vector):Float
     {
-        // flatten vector
-        // trace('ENEMY: ${v} get_pan before');
-        if(v.x < 0) v.angle2D = 0;
-        if(v.x > 0) v.angle2D = Math.PI;
-
-        // trace('ENEMY: ${v} get_pan after');
-
-
         var f:Float = v.x;
         f = Maths.clamp(f, -100, 100);
         return f/200;

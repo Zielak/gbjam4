@@ -4,6 +4,7 @@ package ;
 import components.Collider;
 import components.CrateHolder;
 import luxe.Rectangle;
+import luxe.Sound;
 import luxe.Sprite;
 import luxe.Vector;
 import luxe.components.sprite.SpriteAnimation;
@@ -25,7 +26,7 @@ class Player extends Sprite
     var dashspeed:Float     = 1.8;
 
     var dashcd:Float        = 0;
-    var dashcdmax:Float     = 0.7;
+    var dashcdmax:Float     = 0.4;
 
     var dashtime:Float      = 0;
     var dashtimemax:Float   = 0.4;
@@ -71,7 +72,7 @@ class Player extends Sprite
             SIZE/2,
             SIZE,
             Game.width-SIZE,
-            Game.height-SIZE*2
+            Game.height-SIZE
         );
 
         input = new Input({name: 'input'});
@@ -85,9 +86,9 @@ class Player extends Sprite
         });
         add(collider);
 
-        add( new components.Immortal({
-            time: 9999999
-        }));
+        // add( new components.Immortal({
+        //     time: 9999999
+        // }));
 
         // Animation
 
@@ -129,7 +130,7 @@ class Player extends Sprite
                     "frameset": ["9-11","hold 2","12-14"],
                     "pingpong":"false",
                     "loop": "false",
-                    "speed": "14"
+                    "speed": "8"
                 },
                 "deathsits" : {
                     "frame_size":{ "x":"16", "y":"16" },
@@ -149,7 +150,12 @@ class Player extends Sprite
         crateHolder = new CrateHolder({name:'crate_holder'});
         add(crateHolder);
 
+
+
         events.listen('collision.hit', function(_){
+
+            if( Game.gal_game_over) return;
+
             Luxe.events.fire('player.hit.enemy');
             if( !has('immortal') ) {
                 add( new components.Immortal({time:3}) );
@@ -161,8 +167,26 @@ class Player extends Sprite
             }
         });
 
+        events.listen('galgameover', function(_){
 
-        Luxe.events.listen('game.over.*', function(_){
+            realPos.y = Luxe.camera.center.y;
+            realPos.x = Luxe.camera.center.x - 16;
+            velocity.x = 0;
+            velocity.y = 0;
+
+            remove('immortal');
+            remove('blinking');
+
+            collider.enabled = true;
+            dashing = false;
+
+        });
+
+
+        Luxe.events.listen('game.over.hope', function(_){
+            play_animation('death');
+        });
+        Luxe.events.listen('game.over.distance', function(_){
             play_animation('death');
         });
 
@@ -199,10 +223,7 @@ class Player extends Sprite
                 }
             }
             
-
-                // Update Bounds
-            bounds.x = Luxe.camera.center.x - Game.width/2 + SIZE/2;
-            bounds.y = Luxe.camera.center.y - Game.height/2 + SIZE/2;
+            update_bounds();
 
                 // Apply
             realPos.add(velocity);
@@ -222,11 +243,28 @@ class Player extends Sprite
 
             // Animation
             set_animation();
-        }else{
-            // anim.speed = 0;
+        }
+        else if(Game.gal_game_over)
+        {
+                // Apply
+            realPos.add(velocity);
+
+                // Game velocity too
+            game_v.copy_from(Game.directional_vector());
+            game_v.x *= dt;
+            game_v.y *= dt;
+            realPos.add(game_v);
+
+            set_animation();
         }
 
         // draw_collider();
+    }
+
+    function update_bounds()
+    {
+        bounds.x = Luxe.camera.center.x - Game.width/2 + SIZE/2;
+        bounds.y = Luxe.camera.center.y - Game.height/2 + SIZE/2;
     }
 
     function update_pos()
@@ -285,6 +323,10 @@ class Player extends Sprite
         dashtime = dashtimemax;
 
         if(!has('immortal') ) collider.enabled = false;
+
+
+        Luxe.audio.pitch('jump', Math.random()*0.2 + 0.9 );
+        Luxe.audio.play('jump');
 
         Luxe.events.fire('spawn.puff', {
             pos: pos.clone(),

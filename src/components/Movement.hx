@@ -51,6 +51,7 @@ class Movement extends Component
     override function update(dt:Float):Void
     {
         if(Game.delayed) return;
+        // trace('!delayed');
         // switch(Game.direction)
         // {
         //     case right: velocity.angle2D = Math.PI;

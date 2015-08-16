@@ -108,6 +108,9 @@ class Hud extends Entity
         dist_bar_bg.destroy();
         dist_me.destroy();
         dist_gal.destroy();
+
+        hud_batcher.destroy();
+        camera = null;
         
         fader = null;
         fader_anim = null;
@@ -150,7 +153,18 @@ class Hud extends Entity
 
 
         Luxe.events.listen('game.over.*', function(_){
+            if(hearth_anim!=null) hearth_anim.stop();
+        });
+
+
+        events.listen('hud.hide', function(_){
+            hearth.visible = false;
             hearth_anim.stop();
+            hope_bar_bg.visible = false;
+            hope_bar_line.visible = false;
+            dist_bar_bg.visible = false;
+            dist_me.visible = false;
+            dist_gal.visible = false;
         });
 
 

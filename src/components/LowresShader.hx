@@ -129,10 +129,10 @@ class LowresShader extends Component
 
     override public function onkeydown( event:KeyEvent )
     {
-        if(event.keycode == Key.key_i){
-            enabled = !enabled;
-            final_view.visible = enabled;
-        }
+        // if(event.keycode == Key.key_i){
+        //     enabled = !enabled;
+        //     final_view.visible = enabled;
+        // }
     }
 
 }

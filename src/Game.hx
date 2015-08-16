@@ -1,5 +1,6 @@
 
 import components.Movement;
+import enemies.Gal;
 import luxe.Entity;
 import luxe.Input;
 import luxe.Color;
@@ -9,6 +10,7 @@ import luxe.Sprite;
 import luxe.States;
 
 import luxe.collision.ShapeDrawerLuxe;
+import luxe.tween.Actuate;
 import luxe.utils.Maths;
 import luxe.utils.Random;
 import luxe.Vector;
@@ -22,7 +24,7 @@ class Game extends State {
 
     var player:Player;
     var lightmask:Sprite;
-    var gal:Sprite;
+    var gal:Gal;
 
     var spawner:Spawner;
 
@@ -50,6 +52,7 @@ class Game extends State {
 
     // Did we just loose?
     public static var gameover:Bool = false;
+    public static var gal_game_over:Bool = false;
     
     // quick delay during gameplay, like getting mushroom in Mario
     public static var delayed:Bool = false;
@@ -130,15 +133,18 @@ class Game extends State {
         kill_events();
         spawner.destroy();
         Game.scene.empty();
-        Luxe.scene.empty();
 
-        Luxe.camera.pos.set_xy( -Game.width*1.5, -Game.height*1.5 );
+        var _arr:Array<Entity> = new Array<Entity>();
+        _arr = Luxe.scene.get_named_like('tile', _arr);
+        for(e in _arr){
+            e.destroy();
+        }
+
+        // Luxe.camera.pos.set_xy( -Game.width*1.5, -Game.height*1.5 );
     }
 
     override function onenter<T>(_:T) 
     {
-
-
         reset();
 
         create_hud();
@@ -174,6 +180,8 @@ class Game extends State {
         Game.distance = 0;
 
         Game.playing = false;
+        Game.gameover = false;
+        Game.gal_game_over = false;
         Game.delayed = false;
 
 
@@ -187,6 +195,9 @@ class Game extends State {
 
     function game_over(reason:String)
     {
+        if(reason == 'gal'){
+            gal_game_over = true;
+        }
         Game.playing = false;
         Game.gameover = true;
         Luxe.events.fire('game.over.${reason}');
@@ -205,11 +216,13 @@ class Game extends State {
 
         player = new Player({
             name: 'player',
+            name_unique: true,
             texture: Luxe.resources.texture('assets/images/player.gif'),
             size: new Vector(16,16),
             pos: new Vector(160/2, 144/2),
             centered: true,
             depth: 10,
+            scene: Game.scene,
         });
         player.texture.filter_mag = nearest;
         player.texture.filter_min = nearest;
@@ -249,13 +262,56 @@ class Game extends State {
         game_events.push( Luxe.events.listen('player.hit.enemy', function(_){
             Game.gal_distance += 0.06;
             Game.hope -= 0.05;
-            Luxe.camera.shake(10);
+            Luxe.camera.shake(8);
         }) );
 
         game_events.push( Luxe.events.listen('crate.hit.enemy', function(_){
-            Game.gal_distance -= 0.02;
+            Game.gal_distance -= 0.014;
             Game.hope += 0.25;
-            Luxe.camera.shake(4);
+            Luxe.camera.shake(3);
+        }) );
+
+        // init sweet game over!
+        // First, guy goes right, bumps into gal
+        game_events.push( Luxe.events.listen('game.over.gal', function(_)
+        {
+            trace('game.over.gal');
+            hud.events.fire('hud.hide');
+            player.events.fire('galgameover');
+            Game.direction = right;
+
+
+                // Remove everybody
+            var arr:Array<Entity> = new Array<Entity>();
+            arr = Game.scene.get_named_like('cruncher', arr);
+            for(e in arr){
+                e.destroy();
+            }
+            arr = Game.scene.get_named_like('bomb', arr);
+            for(e in arr){
+                e.destroy();
+            }
+            arr = null;
+
+            
+
+            gal = new Gal({
+                name: 'gal',
+                name_unique: true,
+                pos: new Vector( Math.floor( Luxe.camera.center.x + Game.width ),  Luxe.camera.center.y ),
+                scene: Game.scene,
+            });
+
+            lightmask.visible = false;
+        }) );
+
+        // Finally start the sequence when they touch
+        game_events.push( Luxe.events.listen('player.hit.gal', function(_)
+        {
+            trace('player.hit.gal !!');
+            Actuate.tween(Game, 2, {speed:0});
+            
+            spawner.events.fire('sequence.gal');
         }) );
     }
 
@@ -271,7 +327,7 @@ class Game extends State {
 
     override function update(dt:Float)
     {
-        if(Game.playing && !Game.delayed)
+        if(Game.playing && !Game.delayed || Game.gal_game_over)
         {
             if(!Game.tutorial){
                 Game.hope -= dt * ( Game.hope_mult * ( Game.difficulty*0.5 ) );
@@ -287,6 +343,8 @@ class Game extends State {
             _realCamPos.x += Game.directional_vector().x * dt;
             _realCamPos.y += Game.directional_vector().y * dt;
 
+            
+
             _camTravelled += Game.directional_vector().length * dt;
             
             if(_camTravelled > Tile.TILE_SIZE-1){
@@ -294,17 +352,24 @@ class Game extends State {
                 Luxe.events.fire('spawn.tilescolrow');
             }
 
+
+            if(Game.gal_distance <= 0 && !Game.gal_game_over){
+                game_over('gal');
+            }
+
         }
+
+        // trace( 'Gal distance: ${Game.gal_distance}' );
 
         if(Game.hope > 1){
             Game.hope = 1;
         }
 
-        if(!Game.tutorial){
+        if(!Game.tutorial && !Game.gameover){
             if(Game.hope <= 0){
                 game_over('hope');
             }
-            if(Game.gal_distance > 1.1){
+            if(Game.gal_distance > 1.05){
                 game_over('distance');
             }
 
@@ -322,6 +387,10 @@ class Game extends State {
         Luxe.camera.pos.copy_from(_realCamPos);
         Luxe.camera.pos.x = Math.round(Luxe.camera.pos.x);
         Luxe.camera.pos.y = Math.round(Luxe.camera.pos.y);
+
+        if(Game.gal_game_over){
+            Luxe.camera.pos.x += 10;
+        }
     }
 
 
@@ -334,7 +403,7 @@ class Game extends State {
         }
 
         if(event.keycode == Key.key_p){
-            // Game.delayed = !Game.delayed;
+            Game.delayed = !Game.delayed;
         }
     }
 

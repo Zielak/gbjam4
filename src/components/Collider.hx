@@ -120,7 +120,7 @@ class Collider extends Component {
 
         _entities = new Array<Entity>();
 
-        Game.scene.get_named_like( test_name, _entities );
+        _entities = Game.scene.get_named_like( test_name, _entities );
 
         // trace('got: ${_entities.length} x ${test_name}');
 
@@ -135,7 +135,8 @@ class Collider extends Component {
                     if(!_collider.enabled) continue;
 
                     if(this.entity.destroyed){
-                        trace('what happened?');
+                        // trace('what happened?');
+                        // already destroyed, dummie...
                         break;
                     }
 

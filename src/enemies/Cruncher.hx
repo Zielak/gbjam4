@@ -12,7 +12,6 @@ class Cruncher extends Enemy
 {
     
 
-    var s_death:Sound;
     var s_death_vol:Float = 0.5;
 
     override public function new(options:CruncherOptions)
@@ -58,16 +57,13 @@ class Cruncher extends Enemy
         events.listen('collision.hit', function(_)
         {
             var sp:SoundProp = get_sound_prop();
-            s_death.pitch = Math.random()*0.4 + 0.8;
-            s_death.pan = sp.pan;
-            s_death.volume = sp.volume * s_death_vol;
-            s_death.play();
-            s_death = null;
+            Luxe.audio.pitch('cruncher_die', Math.random()*0.4 + 0.8);
+            Luxe.audio.pan('cruncher_die', sp.pan);
+            Luxe.audio.volume('cruncher_die', sp.volume * s_death_vol);
+            Luxe.audio.play('cruncher_die');
 
             destroy();
         });
-
-        s_death = Luxe.audio.get('cruncher_die');
     }
 
 

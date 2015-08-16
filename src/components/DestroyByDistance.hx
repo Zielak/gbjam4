@@ -17,6 +17,8 @@ class DestroyByDistance extends Component
 
     var timer:Timer;
 
+    var _v:Vector;
+
     override public function new( options:DestroyByDistanceOptions )
     {
         distance = options.distance;
@@ -28,7 +30,7 @@ class DestroyByDistance extends Component
 
     function step()
     {
-        var _v:Vector = Vector.Subtract( entity.pos, Luxe.camera.center );
+        _v = Vector.Subtract( entity.pos, Luxe.camera.center );
 
         if(_v.length > distance)
         {
@@ -36,7 +38,8 @@ class DestroyByDistance extends Component
             // trace('${entity.name} destroyed');
             timer.stop();
             timer = null;
-            entity.destroy();
+            _v = null;
+            this.entity.destroy();
             entity = null;
         }
     }
