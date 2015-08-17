@@ -69,12 +69,22 @@ class Hud extends Entity
         camera.zoom = 4;
         camera.pos.set_xy( -Game.width*1.5, -Game.height*1.5 );
 
-        hud_batcher = Luxe.renderer.create_batcher({
-            name : 'hud_batcher',
-            layer : 5,
-            no_add : false,
-            camera: camera,
-        });
+        // Check if we don't already have our batcher
+        for(b in Luxe.renderer.batchers){
+            if(b.name == 'hud_batcher'){
+                trace('found hud_batcher');
+                hud_batcher = b;
+            }
+        }
+        if(hud_batcher == null){
+            trace('couldnt find hud_batcher' );
+            hud_batcher = Luxe.renderer.create_batcher({
+                name : 'hud_batcher',
+                layer : 5,
+                no_add : false,
+                camera: camera,
+            });
+        }
 
 
 
@@ -109,7 +119,7 @@ class Hud extends Entity
         dist_me.destroy();
         dist_gal.destroy();
 
-        hud_batcher.destroy();
+        // hud_batcher.destroy();
         // camera = null;
         
         // fader = null;
