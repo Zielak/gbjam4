@@ -14,9 +14,9 @@ import phoenix.Texture;
 class Main extends luxe.Game
 {
 
-    var music_loop:Sound;
-    var music_intro:Sound;
-    var music_ending:Sound;
+    var rush_loop:Sound;
+    var rush_intro:Sound;
+    var rush_ending:Sound;
 
     var machine:States;
 
@@ -137,45 +137,59 @@ class Main extends luxe.Game
         // player pressed start in main menu
         Luxe.events.listen('state.menu.start_game', function(_){
             // stop everything just in case
-            Luxe.audio.stop('rush_ending');
-            Luxe.audio.stop('rush_loop');
-            Luxe.audio.stop('rush_intro');
+            rush_ending.stop();
+            rush_loop.stop();
+            rush_intro.stop();
         });
 
         // player enters the Game State
         Luxe.events.listen('game.init', function(_){
             // stop everything just in case
-            Luxe.audio.play('rush_intro');
-            Luxe.audio.on('rush_intro', 'end', start_loop);
+            rush_intro.play();
+            rush_intro.on('end', start_loop);
         });
 
         Luxe.events.listen('game.over.*', function(_){
-            Luxe.audio.stop('rush_loop');
+            rush_loop.stop();
         });
 
         Luxe.events.listen('game.over.gal', function(_){
-            Luxe.audio.stop('rush_loop');
-            Luxe.audio.stop('rush_intro');
-            Luxe.audio.stop('rush_ending');
+            rush_loop.stop();
+            rush_intro.stop();
+            rush_ending.stop();
 
-            Luxe.audio.play('rush_ending');
+            rush_ending.play();
 
         });
     }
 
     function start_loop(_)
     {
-        Luxe.audio.loop('rush_loop');
-        Luxe.audio.off('rush_intro', 'end', start_loop);
+        rush_loop.loop();
+        //Luxe.audio.loop('rush_loop');
+        rush_intro.off('end', start_loop);
+        //Luxe.audio.off('rush_intro', 'end', start_loop);
     }
 
     function init_audio()
     {
-        Luxe.audio.volume('rush_loop', 0.2);
-        Luxe.audio.volume('rush_intro', 0.2);
-        Luxe.audio.volume('rush_ending', 0.2);
+        Luxe.audio.on("rush_ending", "load", function(e){
+            rush_ending = e;
+            rush_ending.volume = 0.3;
+        });
+        
+        Luxe.audio.on("rush_intro", "load", function(e){
+            rush_intro = e;
+            rush_intro.volume = 0.3;
+        });
+        
+        Luxe.audio.on("rush_loop", "load", function(e){
+            rush_loop = e;
+            rush_loop.volume = 0.3;
+        });
 
-        Luxe.audio.play('rush_ending');
+        // Luxe.audio.play('rush_ending');
+        rush_ending.play();
     }
 
     override function onkeyup( e:KeyEvent ) {
