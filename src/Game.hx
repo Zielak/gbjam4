@@ -241,7 +241,7 @@ class Game extends State {
         lightmask.add( new components.Follow({
             name: 'follow',
             target: player,
-            follow_type: components.Follow.FollowType.instant,
+            follow_type: components.Follow.FollowType.smooth,
         }));
         lightmask.add( new components.Light({
             name: 'light',

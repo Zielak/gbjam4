@@ -160,8 +160,8 @@ class Player extends Sprite
             if( !has('immortal') ) {
                 add( new components.Immortal({time:3}) );
                 add( new components.Blinking({
-                    time_off: 0.05,
-                    time_on: 0.1,
+                    time_off: 0.04,
+                    time_on: 0.08,
                     remove_after: 3,
                 }) );
             }

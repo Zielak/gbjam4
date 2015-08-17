@@ -12,7 +12,7 @@ import luxe.Vector;
 class Bomb extends Enemy
 {
 
-    var s_death_vol:Float = 0.4;
+    var s_death_vol:Float = 0.2;
 
     override public function new(options:BombOptions)
     {

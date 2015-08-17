@@ -13,7 +13,7 @@ import components.Collider;
 
 class Crate extends Enemy
 {
-    var s_death_vol:Float = 0.6;
+    var s_death_vol:Float = 0.75;
     
     override public function new(options:SpriteOptions)
     {

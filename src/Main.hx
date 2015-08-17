@@ -64,9 +64,9 @@ class Main extends luxe.Game
         _config.preload.sounds.push({ id:'assets/sounds/start.ogg', name:'start', is_stream:false });
 
         // Music
-        _config.preload.sounds.push({ id:'assets/music/Rush_Intro.ogg', name:'rush_intro', is_stream:false });
-        _config.preload.sounds.push({ id:'assets/music/Rush_Ending.ogg', name:'rush_ending', is_stream:false });
-        _config.preload.sounds.push({ id:'assets/music/Go_Get_Her.ogg', name:'rush_loop', is_stream:false });
+        _config.preload.sounds.push({ id:'assets/music/Rush_Intro.ogg', name:'rush_intro', is_stream:true });
+        _config.preload.sounds.push({ id:'assets/music/Rush_Ending.ogg', name:'rush_ending', is_stream:true });
+        _config.preload.sounds.push({ id:'assets/music/Go_Get_Her.ogg', name:'rush_loop', is_stream:true });
 
         // Shaders
         _config.preload.shaders.push({
@@ -175,17 +175,17 @@ class Main extends luxe.Game
     {
         Luxe.audio.on("rush_ending", "load", function(e){
             rush_ending = e;
-            rush_ending.volume = 0.3;
+            rush_ending.volume = 0.2;
         });
         
         Luxe.audio.on("rush_intro", "load", function(e){
             rush_intro = e;
-            rush_intro.volume = 0.3;
+            rush_intro.volume = 0.2;
         });
         
         Luxe.audio.on("rush_loop", "load", function(e){
             rush_loop = e;
-            rush_loop.volume = 0.3;
+            rush_loop.volume = 0.33;
         });
 
         // Luxe.audio.play('rush_ending');

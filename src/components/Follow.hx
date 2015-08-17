@@ -15,7 +15,7 @@ enum FollowType
 class Follow extends Component
 {
 
-    public var lerp:Float = 0.2;
+    public var lerp:Float = 0.25;
 
     public var follow_type:FollowType = FollowType.instant;
 
