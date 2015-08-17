@@ -58,6 +58,7 @@ class Crate extends Enemy
         // anim.add_event('die', 7, 'die.finished');
 
 
+        if(events == null) return;
         events.listen('collision.hit', function(e:ColliderEvent)
         {
             var sp:SoundProp = get_sound_prop();

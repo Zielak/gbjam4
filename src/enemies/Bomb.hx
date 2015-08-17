@@ -55,6 +55,7 @@ class Bomb extends Enemy
         }) );
 
 
+        if(events == null) return;
         events.listen('collision.hit', function(_)
         {
             var sp:SoundProp = get_sound_prop();

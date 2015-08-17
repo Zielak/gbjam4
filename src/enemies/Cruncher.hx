@@ -45,15 +45,20 @@ class Cruncher extends Enemy
         ';
 
         anim.add_from_json( animation_json );
-        anim.animation = 'walk';
-        anim.play();
-
+        if(!this.destroyed){
+            anim.animation = 'walk';
+            anim.play();
+        }else{
+            trace('he did it!');
+        }
+        
 
         add( new components.Collider({
             size: new Vector(8,8),
         }) );
 
 
+        if(events == null) return;
         events.listen('collision.hit', function(_)
         {
             var sp:SoundProp = get_sound_prop();
