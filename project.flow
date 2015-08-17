@@ -19,7 +19,8 @@
 
     app : {
       name : 'rush',
-      package : 'com.darekgreenly.rush'
+      package : 'com.darekgreenly.rush',
+      icon : 'icons/'
     },
 
     build : {
