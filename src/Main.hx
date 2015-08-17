@@ -69,9 +69,15 @@ class Main extends luxe.Game
         _config.preload.sounds.push({ id:'assets/music/Go_Get_Her.ogg', name:'rush_loop', is_stream:true });
 
         // Shaders
+#if web
         _config.preload.shaders.push({
             id:"lowres", frag_id:"assets/shaders/lowres.glsl", vert_id:"default"
         });
+#else
+        _config.preload.shaders.push({
+            id:"lowres", frag_id:"assets/shaders/lowres_linux.glsl", vert_id:"default"
+        });
+#end
 
         return _config;
 
