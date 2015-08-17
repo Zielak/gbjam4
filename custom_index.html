@@ -64,17 +64,45 @@
 body{
     font-size: 12px;
     font-family: arial;
-    color: white;
+    color: #F6DDF1;
+    background: #3E143C !important
 }
 p{
-    margin: 0.2em 0;
+    margin: 0.5em 0;
 }
 h3{
-    margin: 0.3em 0;
+    margin: 0.5em 0;
+    font-weight: bold;
+    text-shadow: 0 2px #92005B;
 }
 .description{
-    width:640px;
+    width: 640px;
     margin: 0 auto;
+}
+code{
+  color: #2AA794;
+  background-color: #F6DDF1;
+  padding: 1px 3px 0 3px;
+  border-radius: 3px;
+  border-bottom: 1px solid #2aa794;
+}
+a{
+  color: inherit;
+  font-weight: bold;
+  text-decoration: underline;
+  text-shadow: 0 1px #2AA794;
+}
+a:hover{
+  text-decoration: none;
+}
+
+.footer{
+  text-align: center;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 10px;
 }
 </style>
 
@@ -87,20 +115,27 @@ h3{
 <body style="padding: 0; margin: 0; background-color: #111111;">
     <script type="text/javascript" src="./{{project.app.name}}{{#if project.app.web.min}}.min{{/if}}.js"></script>
 
-    <div class="description row col2">
+    <div class="description row col3">
+        <div class="col span_1">
+          <p align="center"><img src="assets/images/rush_logo_web.gif" /></p>
+        </div>
         <div class="col span_1">
             <h3>Movement</h3>
-            <p><strong>W,S,A,D</strong> or <strong>Arrow keys</strong></p>
+            <p><code>W</code>,<code>S</code>,<code>A</code>,<code>D</code> or <code>Arrow keys</code></p>
 
             <h3>Jump ([A] button)</h3>
-            <p>Hol movement key with - <strong>K</strong> or <strong>C</strong></p>
+            <p>Hold movement key and <code>K</code> or <code>C</code></p>
         </div>
         <div class="col span_1">
             <h3>Grab crate ([B] button)</h3>
-            <p><strong>L</strong> or <strong>X</strong></p>
+            <p><code>L</code> or <code>X</code></p>
             <h3>Throw crate ([B] button)</h3>
-            <p>Hold movement key with - <strong>L</strong> or <strong>X</strong></p>
+            <p>Hold movement key and <code>L</code> or <code>X</code></p>
         </div>
+    </div>
+
+    <div class="footer">
+      <p>game by: <a href="https://twitter.com/Zielakpl" target="_blank">@Zielakpl</a> | music by: <a href="https://twitter.com/pedroavelar" target="_blank">@PedroAvelar</a> | <a href="https://github.com/Zielak/gbjam4" target="_blank">get source code</a></p>
     </div>
 </body>
 

@@ -6,6 +6,7 @@ import luxe.Color;
 import luxe.Entity;
 import luxe.Rectangle;
 import luxe.Timer;
+import luxe.tween.Actuate;
 import luxe.Vector;
 import luxe.Visual;
 
@@ -170,7 +171,9 @@ class Spawner extends Entity {
             _v.length = 750;
 
             for(t in _arr){
-                t.add(new components.Movement({velocity: _v}) );
+                if(Math.random() > 0.5){
+                    t.add(new components.Movement({velocity: _v}) );
+                }
             }
             tilespawn_density = 0.25;
             spam_tiles();
@@ -191,6 +194,7 @@ class Spawner extends Entity {
     function init_sequences()
     {
         if(!Game.tutorial){
+            Actuate.tween( Game, 2, {speed:Game.SPEED_INIT});
             populate_sequences();
             pick_sequence();
         }else{
@@ -227,6 +231,13 @@ class Spawner extends Entity {
             pos: nice_vector(Game.width*0.75, Game.height*0.6),
             delay: 2,
         }));
+            // Spawn more crates for the hasty people
+        for(i in 0...10){
+            actions.push(new actions.SpawnCrate({
+                pos: nice_vector(Game.width*0.75, Game.height*0.6),
+                delay: 0,
+            }));
+        }
         actions.push(new actions.ShowTutorialScreen({
             delay: 0.5,
             screen: 'assets/images/text.gif',

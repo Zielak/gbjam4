@@ -110,17 +110,17 @@ class Hud extends Entity
         dist_gal.destroy();
 
         hud_batcher.destroy();
-        camera = null;
+        // camera = null;
         
-        fader = null;
-        fader_anim = null;
-        hearth = null;
-        hearth_anim = null;
-        hope_bar_bg = null;
-        hope_bar_line = null;
-        dist_bar_bg = null;
-        dist_me = null;
-        dist_gal = null;
+        // fader = null;
+        // fader_anim = null;
+        // hearth = null;
+        // hearth_anim = null;
+        // hope_bar_bg = null;
+        // hope_bar_line = null;
+        // dist_bar_bg = null;
+        // dist_me = null;
+        // dist_gal = null;
     }
 
     function initEvents()

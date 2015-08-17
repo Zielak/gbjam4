@@ -50,8 +50,10 @@ class Blinking extends luxe.Component {
     override function onremoved()
     {
         timer = null;
-        sprite.color.a = 1;
-        sprite = null;
+        if(sprite != null){
+            sprite.color.a = 1;
+            sprite = null;
+        }
     }
 
     override function update(dt:Float)

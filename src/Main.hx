@@ -151,6 +151,7 @@ class Main extends luxe.Game
 
         Luxe.events.listen('game.over.*', function(_){
             rush_loop.stop();
+            rush_intro.off('end', start_loop);
         });
 
         Luxe.events.listen('game.over.gal', function(_){

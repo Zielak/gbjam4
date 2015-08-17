@@ -38,7 +38,7 @@ class MenuState extends State {
     override function onenter<T>(_:T) 
     {
 
-        Luxe.renderer.clear_color = new Color().rgb(C.c1);
+        // Luxe.renderer.clear_color = new Color().rgb(C.c1);
         Luxe.camera.pos.set_xy( -Game.width*1.5, -Game.height*1.5 );
 
 
@@ -121,11 +121,12 @@ class MenuState extends State {
 
     function seq1()
     {
-        bg.color.tween(1, {a: 1});
+        bg.color.a = 0;
+        bg.color.tween(1.5, {a: 1});
 
         timer.schedule(1, function(){
             logo.color.tween(1.5, {a: 1});
-            timer.schedule(1.5, function(){
+            timer.schedule(1, function(){
                 seq2();
             });
         });
@@ -198,6 +199,7 @@ class MenuState extends State {
 
     function start_game()
     {
+        input_wait = true;
         Luxe.events.fire('state.menu.start_game');
         s_start.play();
 
