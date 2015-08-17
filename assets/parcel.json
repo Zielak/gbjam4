@@ -1,0 +1,11 @@
+{
+"sounds" : [
+{ id:'assets/sounds/Rush_Explosion.ogg', name:'bomb', is_stream:false },
+{ id:'assets/sounds/Rush_Grab_Box.ogg', name:'pickup', is_stream:false },
+{ id:'assets/sounds/Rush_Throw_Crate.ogg', name:'throw', is_stream:false },
+{ id:'assets/sounds/Rush_Jump.ogg', name:'jump', is_stream:false },
+{ id:'assets/sounds/cruncher_die.ogg', name:'cruncher_die', is_stream:false },
+{ id:'assets/sounds/crate_break.ogg', name:'create', is_stream:false },
+{ id:'assets/sounds/start.ogg', name:'start', is_stream:false }
+]
+}
