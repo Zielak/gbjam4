@@ -14,7 +14,7 @@
 
   project : {
     name : 'Rush',
-    version : '0.4.0',
+    version : '0.4.1',
     author : 'Darek Greenly',
 
     app : {
@@ -27,7 +27,7 @@
       dependencies : {
         luxe : '*',
       },
-      nodefines:['no_debug_console'] 
+      defines:['no_debug_console'] 
     },
 
     files : {
