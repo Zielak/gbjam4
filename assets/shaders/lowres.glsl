@@ -1,6 +1,8 @@
 // #version 130
 
+#ifdef GL_ES
 precision mediump float;
+#endif
 
 #define BRIGHTNESS 1.0
 
