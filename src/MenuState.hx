@@ -142,24 +142,32 @@ class MenuState extends State {
     {
         if(input_wait) return;
 
-        if(event.keycode == Key.key_h){
-            if(!showing_help){
-                show_help();
-            }else{
+        if(showing_help){
+            if(event.keycode == Key.key_h
+            || event.keycode == Key.key_c
+            || event.keycode == Key.key_x
+            || event.keycode == Key.key_k
+            || event.keycode == Key.key_l
+            || event.keycode == Key.space
+            || event.keycode == Key.enter){
                 hide_help();
             }
         }
-
-        if(event.keycode == Key.key_c
-        || event.keycode == Key.key_x
-        || event.keycode == Key.key_k
-        || event.keycode == Key.key_l){
-            if(showing_help){
-                hide_help();
-            }else{
+        else
+        {
+            if(event.keycode == Key.key_h){
+                show_help();
+            }
+            if(event.keycode == Key.key_c
+            || event.keycode == Key.key_x
+            || event.keycode == Key.key_k
+            || event.keycode == Key.key_l
+            || event.keycode == Key.space
+            || event.keycode == Key.enter){
                 start_game();
             }
         }
+
     }
 
 
