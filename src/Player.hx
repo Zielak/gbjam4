@@ -213,11 +213,16 @@ class Player extends Sprite
                 // Dash stuff
             setDashing(dt);
 
+
+            // Throw anytime
+            if(input.Bpressed && crateHolder.holding){
+                // Bpressed for the throwing
+                events.fire('input.Bpressed', {direction:velocity.clone()});
+            }
+
+            // grab only when not dashing
             if(!dashing){
-                if(input.Bpressed && crateHolder.holding){
-                    // Bpressed for the throwing
-                    events.fire('input.Bpressed', {direction:velocity.clone()});
-                }else if(input.B && !crateHolder.holding){
+                if(input.B && !crateHolder.holding){
                     // B for the grabbin
                     events.fire('input.B');
                 }
@@ -310,8 +315,10 @@ class Player extends Sprite
             if(dashcd <= 0
             && input.move
             && input.A
-            && !crateHolder.holding
             ){
+                if(crateHolder.holding){
+                    events.fire('input.Bpressed', {direction:velocity.clone()});
+                }
                 startDashing();
             }
         }
