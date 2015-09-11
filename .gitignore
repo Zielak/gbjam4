@@ -3,4 +3,6 @@ bin/*
 *.xcf
 portals/*
 research/*
-devlog/*.gif
+devlog/*
+assets/music/*
+assets/sounds/*
