@@ -45,14 +45,6 @@ class CrateHolder extends Component {
                 throw_away(e.direction);
             }
         });
-        entity.events.listen('input.B', function(_)
-        {
-            // trace('holding = ${holding}');
-            // Try grabbing those crates!
-            if(!holding){
-                try_grabbing();
-            }
-        });
     }
 
     override function ondestroy()
@@ -70,6 +62,11 @@ class CrateHolder extends Component {
             // trace('update crate pos');
             crate.pos.x = entity.pos.x + POS_X;
             crate.pos.y = entity.pos.y + POS_Y;
+        }
+        else
+        {
+            // Try grabbing whenever we're walking
+            try_grabbing();
         }
 
         if(cd > 0){

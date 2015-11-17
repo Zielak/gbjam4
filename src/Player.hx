@@ -220,13 +220,6 @@ class Player extends Sprite
                 events.fire('input.Bpressed', {direction:velocity.clone()});
             }
 
-            // grab only when not dashing
-            if(!dashing){
-                if(input.B && !crateHolder.holding){
-                    // B for the grabbin
-                    events.fire('input.B');
-                }
-            }
             
             update_bounds();
 
