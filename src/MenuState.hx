@@ -38,7 +38,7 @@ class MenuState extends State {
     override function onenter<T>(_:T) 
     {
 
-        // Luxe.renderer.clear_color = new Color().rgb(C.c1);
+        Luxe.renderer.clear_color = new Color().rgb(C.c1);
         Luxe.camera.pos.set_xy( -Game.width*1.5, -Game.height*1.5 );
 
 
