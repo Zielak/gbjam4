@@ -48,6 +48,7 @@ class Main extends luxe.Game
         // HUD
         _config.preload.textures.push({ id:'assets/images/hud.gif' });
         _config.preload.textures.push({ id:'assets/images/hearth.gif' });
+        _config.preload.textures.push({ id:'assets/images/cursor.gif' });
 
         // World
         _config.preload.textures.push({ id:'assets/images/tiles.gif' });

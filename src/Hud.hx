@@ -93,6 +93,8 @@ class Hud extends Entity
 
         setup_fader();
 
+        add( new components.Cursor({batcher: hud_batcher, depth: 3}) );
+
         if(!Game.tutorial){
             setupHUD();
         }else{

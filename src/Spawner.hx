@@ -225,7 +225,7 @@ class Spawner extends Entity {
         }));
 
         /**
-         * GRAB IT : B
+         * WALK OVER CRATE TO GRAB IT
          */
         actions.push(new actions.SpawnCrate({
             pos: nice_vector(Game.width*0.75, Game.height*0.6),
@@ -241,7 +241,7 @@ class Spawner extends Entity {
         actions.push(new actions.ShowTutorialScreen({
             delay: 0.5,
             screen: 'assets/images/text.gif',
-            uv: new Rectangle(0, 48, 94, 12),
+            uv: new Rectangle(0, 176, 134, 24),
             pos: new Vector(Game.width/2, 48),
             wait: true,
             wait_event: 'player.grab.crate',
@@ -250,7 +250,7 @@ class Spawner extends Entity {
         }));
         
         /**
-         * Throw it, -> + B
+         * POINT AND CLICK TO THROW IT
          */
         // Spawn bomb first
         actions.push(new actions.SpawnBomb({delay: 1.2,
@@ -265,14 +265,14 @@ class Spawner extends Entity {
         actions.push(new actions.ShowTutorialScreen({
             delay: 0,
             screen: 'assets/images/text.gif',
-            uv: new Rectangle(0, 64, 96, 12),
+            uv: new Rectangle(0, 200, 106, 24),
             pos: new Vector(Game.width/2, 48),
             wait: true,
             wait_event: 'player.throw.crate',
         }));
         
         /**
-         * JUMP OVER IT, -> + A
+         * JUMP OVER IT, [SPACE]
          */
         actions.push(new actions.SpawnBomb({delay: 2,
             pos: nice_vector(Game.width*0.6, Game.height*0.65)
@@ -320,7 +320,7 @@ class Spawner extends Entity {
         actions.push(new actions.ShowTutorialScreen({
             delay: 0,
             screen: 'assets/images/text.gif',
-            uv: new Rectangle(0, 120, 112, 12),
+            uv: new Rectangle(0, 120, 114, 12),
             pos: new Vector(Game.width/2, 28),
             wait: true,
             wait_input: true,
