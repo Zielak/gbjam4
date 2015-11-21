@@ -1,8 +1,10 @@
 
 package components;
 
+import luxe.Color;
 import luxe.Component;
 import luxe.Input;
+import luxe.Vector;
 
 class Input extends Component
 {
@@ -14,6 +16,7 @@ class Input extends Component
     public var down:Bool    = false;
 
     public var angle:Float  = 0;
+    public var aim:Float    = 0;
 
     // movement pressed?
     public var move:Bool    = false;
@@ -36,16 +39,17 @@ class Input extends Component
         Luxe.input.bind_key('up',       Key.up);
         Luxe.input.bind_key('down',     Key.down);
 
-        Luxe.input.bind_key('A',   Key.key_k);
-        Luxe.input.bind_key('B',   Key.key_l);
+        Luxe.input.bind_key('A',   Key.space);
 
-        Luxe.input.bind_key('A',   Key.key_c);
-        Luxe.input.bind_key('B',   Key.key_x);
+        Luxe.input.bind_mouse('B',   MouseButton.left);
+
     }
 
     override function update(dt:Float):Void
     {
         updateKeys();
+
+        updateAim();
     }
 
 
@@ -96,6 +100,15 @@ class Input extends Component
         else if ( right )
             angle = 0;
 
+    }
+
+
+    function updateAim()
+    {
+        var p1:Vector = Luxe.camera.screen_point_to_world( Luxe.screen.cursor.pos );
+        var p2:Vector = entity.pos;
+
+        aim = Math.atan2( p1.y - p2.y, p1.x - p2.x);
     }
 
 

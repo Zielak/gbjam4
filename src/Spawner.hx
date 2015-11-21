@@ -232,7 +232,7 @@ class Spawner extends Entity {
             delay: 2,
         }));
             // Spawn more crates for the hasty people
-        for(i in 0...10){
+        for(i in 0...100){
             actions.push(new actions.SpawnCrate({
                 pos: nice_vector(Game.width*0.75, Game.height*0.6),
                 delay: 0,
