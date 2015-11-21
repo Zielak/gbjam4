@@ -18,6 +18,8 @@ class Main extends luxe.Game
     var rush_intro:Sound;
     var rush_ending:Sound;
 
+    var music_muted:Bool = false;
+
     var machine:States;
 
     var shader:Entity;
@@ -46,6 +48,7 @@ class Main extends luxe.Game
         // HUD
         _config.preload.textures.push({ id:'assets/images/hud.gif' });
         _config.preload.textures.push({ id:'assets/images/hearth.gif' });
+        _config.preload.textures.push({ id:'assets/images/cursor.gif' });
 
         // World
         _config.preload.textures.push({ id:'assets/images/tiles.gif' });
@@ -197,6 +200,14 @@ class Main extends luxe.Game
 
         if(e.keycode == Key.escape) {
             // Luxe.shutdown();
+        }
+
+        // MUTE Music
+        if(e.keycode == Key.key_m) {
+            music_muted = !music_muted;
+            Luxe.audio.volume("rush_intro", (music_muted)?0:0.2 );
+            Luxe.audio.volume("rush_ending", (music_muted)?0:0.2 );
+            Luxe.audio.volume("rush_loop", (music_muted)?0:0.33 );
         }
 
     } //onkeyup

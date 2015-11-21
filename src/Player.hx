@@ -217,16 +217,9 @@ class Player extends Sprite
             // Throw anytime
             if(input.Bpressed && crateHolder.holding){
                 // Bpressed for the throwing
-                events.fire('input.Bpressed', {direction:velocity.clone()});
+                throwCrateNow();
             }
 
-            // grab only when not dashing
-            if(!dashing){
-                if(input.B && !crateHolder.holding){
-                    // B for the grabbin
-                    events.fire('input.B');
-                }
-            }
             
             update_bounds();
 
@@ -317,7 +310,7 @@ class Player extends Sprite
             && input.A
             ){
                 if(crateHolder.holding){
-                    events.fire('input.Bpressed', {direction:velocity.clone()});
+                    throwCrateNow();
                 }
                 startDashing();
             }
@@ -356,6 +349,13 @@ class Player extends Sprite
 
         // anim.animation = 'walk';
         // anim.play();
+    }
+
+    function throwCrateNow()
+    {
+        var _dv:Vector = new Vector(10,0);
+        _dv.angle2D = input.aim;
+        events.fire('input.Bpressed', {direction:_dv});
     }
 
     function set_animation()
